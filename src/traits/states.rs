@@ -18,6 +18,9 @@ use std::{error::Error, fmt::Debug, future::Future, hash::Hash};
 /// Instance-level state, which allows us to fetch missing validated state.
 pub trait InstanceState: Debug + Send + Sync {}
 
+/// Application-specific state delta, which will be used to store a list of merkle tree entries.
+pub trait StateDelta: Debug + Send + Sync {}
+
 /// Abstraction over the state that blocks modify
 ///
 /// This trait represents the behaviors that the 'global' ledger state must have:
@@ -34,12 +37,14 @@ pub trait ValidatedState<TYPES: NodeType>:
     type Error: Error + Debug + Send + Sync;
     /// The type of the instance-level state this state is assocaited with
     type Instance: InstanceState;
+    /// The type of the state delta this state is assocaited with.
+    type Delta: StateDelta;
     /// Time compatibility needed for reward collection
     type Time: ConsensusTime;
 
     /// Check if the proposed block header is valid and apply it to the state if so.
     ///
-    /// Returns the new state.
+    /// Returns the new state and state delta.
     ///
     /// # Arguments
     /// * `instance` - Immutable instance-level state.
@@ -52,7 +57,7 @@ pub trait ValidatedState<TYPES: NodeType>:
         instance: &Self::Instance,
         parent_leaf: &Leaf<TYPES>,
         proposed_header: &TYPES::BlockHeader,
-    ) -> impl Future<Output = Result<Self, Self::Error>> + Send;
+    ) -> impl Future<Output = Result<(Self, Self::Delta), Self::Error>> + Send;
 
     /// Construct the state with the given block header.
     ///
@@ -61,7 +66,7 @@ pub trait ValidatedState<TYPES: NodeType>:
 
     /// Construct a genesis validated state.
     #[must_use]
-    fn genesis(instance: &Self::Instance) -> Self;
+    fn genesis(instance: &Self::Instance) -> (Self, Self::Delta);
 
     /// Gets called to notify the persistence backend that this state has been committed
     fn on_commit(&self);
