@@ -38,7 +38,7 @@ pub trait BlockPayload:
     Serialize + Clone + Debug + Display + Hash + PartialEq + Eq + Send + Sync + DeserializeOwned
 {
     /// The error type for this type of block
-    type Error: Error + Debug + Send + Sync;
+    type Error: Error + Debug + Send + Sync + Serialize + DeserializeOwned;
 
     /// The type of the transitions we are applying
     type Transaction: Transaction;

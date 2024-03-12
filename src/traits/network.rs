@@ -24,12 +24,12 @@ use rand::{
     distributions::{Bernoulli, Uniform},
     prelude::Distribution,
 };
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use snafu::Snafu;
 use std::{collections::BTreeSet, fmt::Debug, hash::Hash, sync::Arc, time::Duration};
 
 /// for any errors we decide to add to memory network
-#[derive(Debug, Snafu)]
+#[derive(Debug, Snafu, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
 pub enum MemoryNetworkError {
     /// stub
@@ -37,16 +37,15 @@ pub enum MemoryNetworkError {
 }
 
 /// Centralized server specific errors
-#[derive(Debug, Snafu)]
+#[derive(Debug, Snafu, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
 pub enum CentralizedServerNetworkError {
     /// The centralized server could not find a specific message.
     NoMessagesInQueue,
 }
 
-
 /// Centralized server specific errors
-#[derive(Debug, Snafu)]
+#[derive(Debug, Snafu, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
 pub enum PushCdnNetworkError {
     /// Failed to receive a message from the server
@@ -56,7 +55,7 @@ pub enum PushCdnNetworkError {
 }
 
 /// Web server specific errors
-#[derive(Debug, Snafu)]
+#[derive(Debug, Snafu, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
 pub enum WebServerNetworkError {
     /// The injected consensus data is incorrect
@@ -145,6 +144,85 @@ pub enum NetworkError {
     UnableToCancel,
     /// The requested data was not found
     NotFound,
+}
+
+impl Serialize for NetworkError {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            NetworkError::Libp2p { source } => {
+                NetworkError::Libp2p { source: *source }.serialize(serializer)
+            }
+            NetworkError::Libp2pMulti { sources } => {
+                NetworkError::Libp2pMulti { sources: *sources }.serialize(serializer)
+            }
+            NetworkError::MemoryNetwork { source } => {
+                NetworkError::MemoryNetwork { source: *source }.serialize(serializer)
+            }
+            NetworkError::PushCdnNetwork { source } => {
+                NetworkError::PushCdnNetwork { source: *source }.serialize(serializer)
+            }
+            NetworkError::CentralizedServer { source } => {
+                NetworkError::CentralizedServer { source: *source }.serialize(serializer)
+            }
+            NetworkError::WebServer { source } => {
+                NetworkError::WebServer { source: *source }.serialize(serializer)
+            }
+            NetworkError::UnimplementedFeature => {
+                NetworkError::UnimplementedFeature.serialize(serializer)
+            }
+            NetworkError::CouldNotDeliver => NetworkError::CouldNotDeliver.serialize(serializer),
+            NetworkError::NoSuchNode => NetworkError::NoSuchNode.serialize(serializer),
+            NetworkError::FailedToSerialize { source } => {
+                NetworkError::FailedToSerialize { source: *source }.serialize(serializer)
+            }
+            NetworkError::FailedToDeserialize { source } => {
+                NetworkError::FailedToDeserialize { source: *source }.serialize(serializer)
+            }
+            NetworkError::Timeout { source } => {
+                NetworkError::Timeout { source: *source }.serialize(serializer)
+            }
+            NetworkError::ChannelSend => NetworkError::ChannelSend.serialize(serializer),
+            NetworkError::ShutDown => NetworkError::ShutDown.serialize(serializer),
+            NetworkError::UnableToCancel => NetworkError::UnableToCancel.serialize(serializer),
+            NetworkError::NotFound => NetworkError::NotFound.serialize(serializer),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for NetworkError {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let hotshot_error_enum = NetworkError::deserialize(deserializer)?;
+        match hotshot_error_enum {
+            NetworkError::Libp2p { source } => Ok(NetworkError::Libp2p { source }),
+            NetworkError::Libp2pMulti { sources } => Ok(NetworkError::Libp2pMulti { sources }),
+            NetworkError::MemoryNetwork { source } => Ok(NetworkError::MemoryNetwork { source }),
+            NetworkError::PushCdnNetwork { source } => Ok(NetworkError::PushCdnNetwork { source }),
+            NetworkError::CentralizedServer { source } => {
+                Ok(NetworkError::CentralizedServer { source })
+            }
+            NetworkError::WebServer { source } => Ok(NetworkError::WebServer { source }),
+            NetworkError::UnimplementedFeature => Ok(NetworkError::UnimplementedFeature),
+            NetworkError::CouldNotDeliver => Ok(NetworkError::CouldNotDeliver),
+            NetworkError::NoSuchNode => Ok(NetworkError::NoSuchNode),
+            NetworkError::FailedToSerialize { source } => {
+                Ok(NetworkError::FailedToSerialize { source })
+            }
+            NetworkError::FailedToDeserialize { source } => {
+                Ok(NetworkError::FailedToDeserialize { source })
+            }
+            NetworkError::Timeout { source } => Ok(NetworkError::Timeout { source }),
+            NetworkError::ChannelSend => Ok(NetworkError::ChannelSend),
+            NetworkError::ShutDown => Ok(NetworkError::ShutDown),
+            NetworkError::UnableToCancel => Ok(NetworkError::UnableToCancel),
+            NetworkError::NotFound => Ok(NetworkError::NotFound),
+        }
+    }
 }
 
 #[derive(Clone, Debug)]

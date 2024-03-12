@@ -1,5 +1,7 @@
 //! Events that a `HotShot` instance can emit
 
+use serde::{Deserialize, Serialize};
+
 use crate::{
     data::{DAProposal, Leaf, QuorumProposal, UpgradeProposal, VidDisperse},
     error::HotShotError,
@@ -13,7 +15,8 @@ use std::sync::Arc;
 ///
 /// This includes some metadata, such as the stage and view number that the event was generated in,
 /// as well as an inner [`EventType`] describing the event proper.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(bound(deserialize = "TYPES: NodeType"))]
 pub struct Event<TYPES: NodeType> {
     /// The view number that this event originates from
     pub view_number: TYPES::Time,
@@ -22,7 +25,8 @@ pub struct Event<TYPES: NodeType> {
 }
 
 /// Decided leaf with the corresponding state and VID info.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(bound(deserialize = "TYPES: NodeType"))]
 pub struct LeafInfo<TYPES: NodeType> {
     /// Decided leaf.
     pub leaf: Leaf<TYPES>,
@@ -59,7 +63,8 @@ pub type LeafChain<TYPES> = Vec<LeafInfo<TYPES>>;
 /// This enum does not include metadata shared among all variants, such as the stage and view
 /// number, and is thus always returned wrapped in an [`Event`].
 #[non_exhaustive]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(bound(deserialize = "TYPES: NodeType"))]
 pub enum EventType<TYPES: NodeType> {
     /// A view encountered an error and was interrupted
     Error {
