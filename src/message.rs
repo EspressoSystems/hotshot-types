@@ -3,7 +3,6 @@
 //! This module contains types used to represent the various types of messages that
 //! `HotShot` nodes can send among themselves.
 
-use crate::constants::Version;
 use crate::data::{QuorumProposal, UpgradeProposal};
 use crate::simple_certificate::{
     DACertificate, ViewSyncCommitCertificate2, ViewSyncFinalizeCertificate2,
@@ -24,6 +23,7 @@ use crate::{
         node_implementation::{ConsensusTime, NodeType},
     },
 };
+use versioned_binary_serialization::version::Version;
 
 use derivative::Derivative;
 use either::Either::{self, Left, Right};
