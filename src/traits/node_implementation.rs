@@ -28,6 +28,7 @@ use std::{
     ops,
     ops::{Deref, Sub},
     sync::Arc,
+    time::Duration,
 };
 
 /// Node implementation aggregate trait
@@ -100,6 +101,7 @@ pub trait TestableNodeImplementation<TYPES: NodeType>: NodeImplementation<TYPES>
         num_bootstrap: usize,
         da_committee_size: usize,
         reliability_config: Option<Box<dyn NetworkReliability>>,
+        secondary_network_delay: Duration,
     ) -> Box<dyn Fn(u64) -> (Arc<Self::QuorumNetwork>, Arc<Self::QuorumNetwork>)>;
 }
 
@@ -162,6 +164,7 @@ where
         num_bootstrap: usize,
         da_committee_size: usize,
         reliability_config: Option<Box<dyn NetworkReliability>>,
+        secondary_network_delay: Duration,
     ) -> Box<dyn Fn(u64) -> (Arc<Self::QuorumNetwork>, Arc<Self::QuorumNetwork>)> {
         <I::QuorumNetwork as TestableNetworkingImplementation<TYPES>>::generator(
             expected_node_count,
@@ -170,6 +173,7 @@ where
             da_committee_size,
             false,
             reliability_config.clone(),
+            secondary_network_delay,
         )
     }
 }

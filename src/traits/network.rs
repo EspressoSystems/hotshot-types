@@ -265,8 +265,6 @@ pub struct ResponseChannel<M: NetworkMsg>(pub oneshot::Sender<M>);
 #[derive(Serialize, Deserialize, Derivative, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(bound(deserialize = ""))]
 pub struct DataRequest<TYPES: NodeType> {
-    /// Hotshot key of who to send the request to
-    pub recipient: TYPES::SignatureKey,
     /// Request
     pub request: RequestKind<TYPES>,
     /// View this message is for
@@ -404,6 +402,7 @@ where
         da_committee_size: usize,
         is_da: bool,
         reliability_config: Option<Box<dyn NetworkReliability>>,
+        secondary_network_delay: Duration,
     ) -> Box<dyn Fn(u64) -> (Arc<Self>, Arc<Self>) + 'static>;
 
     /// Get the number of messages in-flight.
