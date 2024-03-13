@@ -229,8 +229,6 @@ pub struct ResponseChannel<M: NetworkMsg>(pub oneshot::Sender<M>);
 #[derive(Serialize, Deserialize, Derivative, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(bound(deserialize = ""))]
 pub struct DataRequest<TYPES: NodeType> {
-    /// Hotshot key of who to send the request to
-    pub recipient: TYPES::SignatureKey,
     /// Request
     pub request: RequestKind<TYPES>,
     /// View this message is for
