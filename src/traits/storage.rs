@@ -5,10 +5,11 @@ use crate::{data::Leaf, simple_certificate::QuorumCertificate, vote::HasViewNumb
 use async_trait::async_trait;
 use commit::Commitment;
 use derivative::Derivative;
+use serde::{Deserialize, Serialize};
 use snafu::Snafu;
 use std::collections::{BTreeMap, BTreeSet};
 /// Errors that can occur in the storage layer.
-#[derive(Clone, Debug, Snafu)]
+#[derive(Clone, Debug, Snafu, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
 pub enum StorageError {
     /// No genesis view was inserted

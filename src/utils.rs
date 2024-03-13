@@ -172,6 +172,7 @@ impl AsRef<Sha256Digest> for BuilderCommitment {
 ///   - Varint encoding
 ///   - Reject trailing bytes
 #[must_use]
+#[allow(clippy::type_complexity)]
 pub fn bincode_opts() -> WithOtherTrailing<
     WithOtherIntEncoding<
         WithOtherEndian<WithOtherLimit<DefaultOptions, bincode::config::Infinite>, LittleEndian>,

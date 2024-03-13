@@ -29,7 +29,7 @@ use snafu::Snafu;
 use std::{collections::BTreeSet, fmt::Debug, hash::Hash, sync::Arc, time::Duration};
 
 /// for any errors we decide to add to memory network
-#[derive(Debug, Snafu)]
+#[derive(Debug, Snafu, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
 pub enum MemoryNetworkError {
     /// stub
@@ -37,7 +37,7 @@ pub enum MemoryNetworkError {
 }
 
 /// Centralized server specific errors
-#[derive(Debug, Snafu)]
+#[derive(Debug, Snafu, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
 pub enum CentralizedServerNetworkError {
     /// The centralized server could not find a specific message.
@@ -45,7 +45,7 @@ pub enum CentralizedServerNetworkError {
 }
 
 /// Centralized server specific errors
-#[derive(Debug, Snafu)]
+#[derive(Debug, Snafu, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
 pub enum PushCdnNetworkError {
     /// Failed to receive a message from the server
@@ -55,7 +55,7 @@ pub enum PushCdnNetworkError {
 }
 
 /// Web server specific errors
-#[derive(Debug, Snafu)]
+#[derive(Debug, Snafu, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
 pub enum WebServerNetworkError {
     /// The injected consensus data is incorrect
@@ -145,7 +145,6 @@ pub enum NetworkError {
     /// The requested data was not found
     NotFound,
 }
-
 #[derive(Clone, Debug)]
 // Storing view number as a u64 to avoid the need TYPES generic
 /// Events to poll or cancel consensus processes.

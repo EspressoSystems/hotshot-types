@@ -12,14 +12,14 @@ use crate::{
         BlockPayload,
     },
 };
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::{error::Error, fmt::Debug, future::Future, hash::Hash};
 
 /// Instance-level state, which allows us to fetch missing validated state.
 pub trait InstanceState: Debug + Send + Sync {}
 
 /// Application-specific state delta, which will be used to store a list of merkle tree entries.
-pub trait StateDelta: Debug + Send + Sync {}
+pub trait StateDelta: Debug + Send + Sync + Serialize + for<'a> Deserialize<'a> {}
 
 /// Abstraction over the state that blocks modify
 ///
