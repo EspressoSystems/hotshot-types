@@ -44,6 +44,16 @@ pub enum CentralizedServerNetworkError {
     NoMessagesInQueue,
 }
 
+/// Centralized server specific errors
+#[derive(Debug, Snafu)]
+#[snafu(visibility(pub))]
+pub enum PushCdnNetworkError {
+    /// Failed to receive a message from the server
+    FailedToReceive,
+    /// Failed to send a message to the server
+    FailedToSend,
+}
+
 /// Web server specific errors
 #[derive(Debug, Snafu)]
 #[snafu(visibility(pub))]
@@ -87,6 +97,11 @@ pub enum NetworkError {
     MemoryNetwork {
         /// source of error
         source: MemoryNetworkError,
+    },
+    /// Push CDN network-specific errors
+    PushCdnNetwork {
+        /// source of error
+        source: PushCdnNetworkError,
     },
     /// Centralized server specific errors
     CentralizedServer {
@@ -366,6 +381,7 @@ where
         da_committee_size: usize,
         is_da: bool,
         reliability_config: Option<Box<dyn NetworkReliability>>,
+        secondary_network_delay: Duration,
     ) -> Box<dyn Fn(u64) -> (Arc<Self>, Arc<Self>) + 'static>;
 
     /// Get the number of messages in-flight.
