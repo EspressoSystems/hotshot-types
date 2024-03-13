@@ -16,7 +16,6 @@ use super::{node_implementation::NodeType, signature_key::SignatureKey};
 use crate::{
     data::ViewNumber,
     message::{MessagePurpose, SequencingMessage},
-    vid::VidCommitment,
     BoxSyncFuture,
 };
 use async_compatibility_layer::channel::UnboundedSendError;
@@ -43,6 +42,16 @@ pub enum MemoryNetworkError {
 pub enum CentralizedServerNetworkError {
     /// The centralized server could not find a specific message.
     NoMessagesInQueue,
+}
+
+/// Centralized server specific errors
+#[derive(Debug, Snafu)]
+#[snafu(visibility(pub))]
+pub enum PushCdnNetworkError {
+    /// Failed to receive a message from the server
+    FailedToReceive,
+    /// Failed to send a message to the server
+    FailedToSend,
 }
 
 /// Web server specific errors
@@ -88,6 +97,11 @@ pub enum NetworkError {
     MemoryNetwork {
         /// source of error
         source: MemoryNetworkError,
+    },
+    /// Push CDN network-specific errors
+    PushCdnNetwork {
+        /// source of error
+        source: PushCdnNetworkError,
     },
     /// Centralized server specific errors
     CentralizedServer {
@@ -230,19 +244,20 @@ pub struct ResponseChannel<M: NetworkMsg>(pub oneshot::Sender<M>);
 #[derive(Serialize, Deserialize, Derivative, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(bound(deserialize = ""))]
 pub struct DataRequest<TYPES: NodeType> {
-    /// Hotshot key of who to send the request to
-    pub recipient: TYPES::SignatureKey,
     /// Request
     pub request: RequestKind<TYPES>,
     /// View this message is for
     pub view: TYPES::Time,
+    /// signature of the Sha256 hash of the data so outsiders can't use know
+    /// public keys with stake.
+    pub signature: <TYPES::SignatureKey as SignatureKey>::PureAssembledSignatureType,
 }
 
 /// Underlying data request
 #[derive(Serialize, Deserialize, Derivative, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum RequestKind<TYPES: NodeType> {
     /// Request VID data by our key and the VID commitment
-    VID(VidCommitment, TYPES::SignatureKey),
+    VID(TYPES::Time, TYPES::SignatureKey),
     /// Request a DA proposal for a certain view
     DAProposal(TYPES::Time),
 }
@@ -256,6 +271,8 @@ pub enum ResponseMessage<TYPES: NodeType> {
     Found(SequencingMessage<TYPES>),
     /// Peer failed to get us data
     NotFound,
+    /// The Request was denied
+    Denied,
 }
 
 /// represents a networking implmentration
@@ -364,6 +381,7 @@ where
         da_committee_size: usize,
         is_da: bool,
         reliability_config: Option<Box<dyn NetworkReliability>>,
+        secondary_network_delay: Duration,
     ) -> Box<dyn Fn(u64) -> (Arc<Self>, Arc<Self>) + 'static>;
 
     /// Get the number of messages in-flight.
