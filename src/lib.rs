@@ -181,6 +181,8 @@ pub struct HotShotConfig<KEY: SignatureKey, ELECTIONCONFIG: ElectionConfig> {
     pub propose_min_round_time: Duration,
     /// The maximum amount of time a leader can wait to start a round
     pub propose_max_round_time: Duration,
+    /// time to wait until we request data associated with a proposal
+    pub data_request_delay: Duration,
     /// the election configuration
     pub election_config: Option<ELECTIONCONFIG>,
 }
