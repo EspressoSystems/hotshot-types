@@ -24,9 +24,8 @@ use rand::{
     distributions::{Bernoulli, Uniform},
     prelude::Distribution,
 };
-use serde::ser::StdError;
 use serde::{Deserialize, Serialize};
-use snafu::{AsErrorSource, Snafu};
+use snafu::Snafu;
 use std::{collections::BTreeSet, fmt::Debug, hash::Hash, sync::Arc, time::Duration};
 
 /// for any errors we decide to add to memory network
@@ -80,27 +79,6 @@ pub enum TransmitType {
     DACommitteeBroadcast,
 }
 
-// Define the trait
-// #[typetag::serde(tag = "type")]
-// pub trait MyTraitSerde:
-//     std::error::Error + Send + Sync + 'static + AsErrorSource + StdError
-// {
-// }
-
-// #[derive(Debug, Snafu, Clone, Copy, Serialize, Deserialize)]
-// #[snafu(visibility(pub))]
-// pub enum BincodeErr {
-//     BincodeError,
-// }
-// #[derive(Debug)]
-// pub struct BincodeError(bincode::Error);
-// #[derive(Debug, Snafu, Clone, Copy, Serialize, Deserialize)]
-// #[snafu(visibility(pub))]
-// pub enum TimeoutErr {
-//     Timeouterr,
-// }
-// #[derive(Debug)]
-// pub struct Timeouterr(TimeoutError);
 /// Error type for networking
 #[derive(Debug, Snafu)]
 #[snafu(visibility(pub))]
