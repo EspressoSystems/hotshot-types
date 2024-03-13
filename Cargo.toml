@@ -32,7 +32,6 @@ commit = { git = "https://github.com/EspressoSystems/commit" }
 custom_debug = "0.5"
 digest = "0.10"
 either = { version = "1.10", features = ["serde"] }
-erased-serde = "0.4"
 espresso-systems-common = { git = "https://github.com/espressosystems/espresso-systems-common", tag = "0.4.1" }
 ethereum-types = { version = "0.14.1", features = ["impl-serde"] }
 futures = "0.3.30"
@@ -56,7 +55,6 @@ tagged-base64 = { git = "https://github.com/EspressoSystems/tagged-base64", tag 
 time = "0.3.34"
 tracing = "0.1.40"
 typenum = "1.17.0"
-typetag = "0.2"
 derivative = "2.2.0"
 displaydoc = { version = "0.2.3", default-features = false }
 dyn-clone = { git = "https://github.com/dtolnay/dyn-clone", tag = "1.0.17" }
