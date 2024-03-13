@@ -123,12 +123,12 @@ pub enum NetworkError {
     /// Failed to serialize a network message
     FailedToSerialize {
         /// Originating bincode error
-        source: bincode::Error,
+        source: anyhow::Error,
     },
     /// Failed to deserealize a network message
     FailedToDeserialize {
         /// originating bincode error
-        source: bincode::Error,
+        source: anyhow::Error,
     },
     /// A timeout occurred
     Timeout {
