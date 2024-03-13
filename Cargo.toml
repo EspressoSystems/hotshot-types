@@ -4,7 +4,7 @@ description = "Types and traits for the HotShot consesus module"
 edition = "2021"
 name = "hotshot-types"
 readme = "../README.md"
-version = "0.1.0"
+version = "0.1.4"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
