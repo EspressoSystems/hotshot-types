@@ -217,7 +217,7 @@ impl<TYPES: NodeType> HasViewNumber<TYPES> for UpgradeProposal<TYPES> {
 }
 
 /// The error type for block and its transactions.
-#[derive(Snafu, Debug)]
+#[derive(Snafu, Debug, Serialize, Deserialize)]
 pub enum BlockError {
     /// Invalid block header.
     InvalidBlockHeader,
