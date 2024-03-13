@@ -25,7 +25,7 @@ use rand::{
     prelude::Distribution,
 };
 use serde::ser::StdError;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use snafu::{AsErrorSource, Snafu};
 use std::{collections::BTreeSet, fmt::Debug, hash::Hash, sync::Arc, time::Duration};
 
@@ -79,30 +79,6 @@ pub enum TransmitType {
     /// broadcast to DA committee
     DACommitteeBroadcast,
 }
-//#[typetag::serde(tag = "mytraitserde")]
-//pub trait MyTraitSerde: std::error::Error + Send + Sync + erased_serde::Serialize {}
-// pub trait MyTraitSerde: std::error::Error + Send + Sync {}
-
-// // Implement `serde::Serialize` for the trait object
-// impl Serialize for dyn MyTraitSerde {
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer,
-//     {
-//         Serialize::serialize(&self, serializer)
-//     }
-// }
-
-// // Implement `serde::Deserialize` for the trait object
-// impl<'de> Deserialize<'de> for Box<dyn MyTraitSerde> {
-//     fn deserialize<D>(deserializer: D) -> Result<Box<dyn MyTraitSerde>, D::Error>
-//     where
-//         D: serde::Deserializer<'de>,
-//     {
-//         let value = Box<dyn MyTraitSerde>::deserialize(deserializer)?;
-//         Ok(Box::new(value))
-//     }
-// }
 
 // Define the trait
 #[typetag::serde(tag = "type")]
@@ -111,102 +87,20 @@ pub trait MyTraitSerde:
 {
 }
 
-// Implement `serde::Serialize` for the trait object
-// impl Serialize for Box<dyn MyTraitSerde> {
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer,
-//     {
-//         serde::Serialize::serialize(self, serializer)
-//     }
-// }
-// implement deserialize for the MyTraitSerde
-// impl<'de> Deserialize<'de> for Box<dyn MyTraitSerde> {
-//     fn deserialize<D>(deserializer: D) -> Result<Box<dyn MyTraitSerde>, D::Error>
-//     where
-//         D: serde::Deserializer<'de>,
-//     {
-//         let value = Box<dyn MyTraitSerde>::deserialize(deserializer)?;
-//         Ok(value)
-//     }
-// }
 #[derive(Debug, Snafu, Clone, Copy, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
-pub enum BinError {
+pub enum BincodeErr {
     BincodeError,
 }
 #[derive(Debug)]
 pub struct BincodeError(bincode::Error);
-
-// impl Serialize for BincodeError {
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer,
-//     {
-//         serde::Serialize::serialize(self, serializer)
-//     }
-// }
-// // implement deserialize for bincode error
-// impl<'de> Deserialize<'de> for BincodeError {
-//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-//     where
-//         D: serde::Deserializer<'de>,
-//     {
-//         let value = BincodeError::deserialize(deserializer)?;
-//         Ok(value)
-//     }
-// }
 #[derive(Debug, Snafu, Clone, Copy, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
-pub enum TimeourErr {
-    TimeoutErr,
+pub enum TimeoutErr {
+    Timeouterr,
 }
 #[derive(Debug)]
-pub struct TimeoutErr(TimeoutError);
-// impl Serialize for TimeoutErr {
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer,
-//     {
-//         serde::Serialize::serialize(self, serializer)
-//     }
-// }
-// impl<'de> Deserialize<'de> for TimeoutErr {
-//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-//     where
-//         D: serde::Deserializer<'de>,
-//     {
-//         let value = TimeoutErr::deserialize(deserializer)?;
-//         Ok(value)
-//     }
-// }
-// Implement `serde::Deserialize` for the trait object
-// impl<'de> Deserialize<'de> for Box<dyn MyTraitSerde> {
-//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-//     where
-//         D: serde::Deserializer<'de>,
-//     {
-//         let value: dyn MyTraitSerde = serde::Deserialize::deserialize(deserializer)?;
-//         Ok(Box::new(value))
-//     }
-// }
-// impl<'a> serde::Serialize for dyn MyTraitSerde + 'a {
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer,
-//     {
-//         erased_serde::serialize(self, serializer)
-//     }
-// }
-// // impl deserialize for dyn MyTraitSerde also
-// impl<'de> serde::Deserialize<'de> for Box<dyn MyTraitSerde> {
-//     fn deserialize<D>(deserializer: D) -> Result<Box<dyn MyTraitSerde>, D::Error>
-//     where
-//         D: serde::Deserializer<'de>,
-//     {
-//         erased_serde::deserialize(deserializer)
-//     }
-// }
+pub struct Timeouterr(TimeoutError);
 /// Error type for networking
 #[derive(Debug, Snafu, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
@@ -214,14 +108,11 @@ pub enum NetworkError {
     /// Libp2p specific errors
     Libp2p {
         /// source of error
-        //#[serde(bound(deserialize = "Box<dyn MyTraitSerde>: Deserialize<'de>"))]
-        // #[serde(bound(serialize = "Box<dyn std::error::Error + Send + Sync>: Serialize"))]
         source: Box<dyn MyTraitSerde>,
     },
     /// collection of libp2p secific errors
     Libp2pMulti {
         /// sources of errors
-        //#[serde(bound(deserialize = "Box<dyn MyTraitSerde>: Deserialize<'de>"))]
         sources: Vec<Box<dyn MyTraitSerde>>,
     },
     /// memory network specific errors
@@ -254,20 +145,17 @@ pub enum NetworkError {
     /// Failed to serialize a network message
     FailedToSerialize {
         /// Originating bincode error
-        //#[serde(bound(deserialize = "BincodeError: Deserialize<'de>"))]
-        source: BinError,
+        source: BincodeErr,
     },
     /// Failed to deserealize a network message
     FailedToDeserialize {
         /// originating bincode error
-        //#[serde(bound(deserialize = "BincodeError: Deserialize<'de>"))]
-        source: BinError,
+        source: BincodeErr,
     },
     /// A timeout occurred
     Timeout {
         /// Source of error
-        //#[serde(bound(deserialize = "TimeoutErr: Deserialize<'de>"))]
-        source: TimeourErr,
+        source: TimeoutErr,
     },
     /// Error sending output to consumer of NetworkingImplementation
     /// TODO this should have more information
@@ -279,87 +167,6 @@ pub enum NetworkError {
     /// The requested data was not found
     NotFound,
 }
-/*
-impl Serialize for NetworkError {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            NetworkError::Libp2p { source } => {
-                NetworkError::Libp2p { source: *source }.serialize(serializer)
-            }
-            NetworkError::Libp2pMulti { sources } => {
-                NetworkError::Libp2pMulti { sources: *sources }.serialize(serializer)
-            }
-            NetworkError::MemoryNetwork { source } => {
-                NetworkError::MemoryNetwork { source: *source }.serialize(serializer)
-            }
-            NetworkError::PushCdnNetwork { source } => {
-                NetworkError::PushCdnNetwork { source: *source }.serialize(serializer)
-            }
-            NetworkError::CentralizedServer { source } => {
-                NetworkError::CentralizedServer { source: *source }.serialize(serializer)
-            }
-            NetworkError::WebServer { source } => {
-                NetworkError::WebServer { source: *source }.serialize(serializer)
-            }
-            NetworkError::UnimplementedFeature => {
-                NetworkError::UnimplementedFeature.serialize(serializer)
-            }
-            NetworkError::CouldNotDeliver => NetworkError::CouldNotDeliver.serialize(serializer),
-            NetworkError::NoSuchNode => NetworkError::NoSuchNode.serialize(serializer),
-            NetworkError::FailedToSerialize { source } => {
-                NetworkError::FailedToSerialize { source: *source }.serialize(serializer)
-            }
-            NetworkError::FailedToDeserialize { source } => {
-                NetworkError::FailedToDeserialize { source: *source }.serialize(serializer)
-            }
-            NetworkError::Timeout { source } => {
-                NetworkError::Timeout { source: *source }.serialize(serializer)
-            }
-            NetworkError::ChannelSend => NetworkError::ChannelSend.serialize(serializer),
-            NetworkError::ShutDown => NetworkError::ShutDown.serialize(serializer),
-            NetworkError::UnableToCancel => NetworkError::UnableToCancel.serialize(serializer),
-            NetworkError::NotFound => NetworkError::NotFound.serialize(serializer),
-        }
-    }
-}
-
-impl<'de> Deserialize<'de> for NetworkError {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let hotshot_error_enum = NetworkError::deserialize(deserializer)?;
-        match hotshot_error_enum {
-            NetworkError::Libp2p { source } => Ok(NetworkError::Libp2p { source }),
-            NetworkError::Libp2pMulti { sources } => Ok(NetworkError::Libp2pMulti { sources }),
-            NetworkError::MemoryNetwork { source } => Ok(NetworkError::MemoryNetwork { source }),
-            NetworkError::PushCdnNetwork { source } => Ok(NetworkError::PushCdnNetwork { source }),
-            NetworkError::CentralizedServer { source } => {
-                Ok(NetworkError::CentralizedServer { source })
-            }
-            NetworkError::WebServer { source } => Ok(NetworkError::WebServer { source }),
-            NetworkError::UnimplementedFeature => Ok(NetworkError::UnimplementedFeature),
-            NetworkError::CouldNotDeliver => Ok(NetworkError::CouldNotDeliver),
-            NetworkError::NoSuchNode => Ok(NetworkError::NoSuchNode),
-            NetworkError::FailedToSerialize { source } => {
-                Ok(NetworkError::FailedToSerialize { source })
-            }
-            NetworkError::FailedToDeserialize { source } => {
-                Ok(NetworkError::FailedToDeserialize { source })
-            }
-            NetworkError::Timeout { source } => Ok(NetworkError::Timeout { source }),
-            NetworkError::ChannelSend => Ok(NetworkError::ChannelSend),
-            NetworkError::ShutDown => Ok(NetworkError::ShutDown),
-            NetworkError::UnableToCancel => Ok(NetworkError::UnableToCancel),
-            NetworkError::NotFound => Ok(NetworkError::NotFound),
-        }
-    }
-}
-*/
-
 #[derive(Clone, Debug)]
 // Storing view number as a u64 to avoid the need TYPES generic
 /// Events to poll or cancel consensus processes.

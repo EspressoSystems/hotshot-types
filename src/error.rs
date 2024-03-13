@@ -3,12 +3,12 @@
 //! This module provides [`HotShotError`], which is an enum representing possible faults that can
 //! occur while interacting with this crate.
 
-use crate::traits::network::TimeourErr;
+use crate::traits::network::TimeoutErr;
 use crate::traits::{
     block_contents::BlockPayload, node_implementation::NodeType, storage::StorageError,
 };
 #[cfg(async_executor_impl = "async-std")]
-use async_std::future::TimeoutError;
+//use async_std::future::TimeoutError;
 use serde::{Deserialize, Serialize};
 use snafu::Snafu;
 use std::num::NonZeroU64;
@@ -62,7 +62,7 @@ pub enum HotShotError<TYPES: NodeType> {
     /// HotShot timed out waiting for msgs
     TimeoutError {
         /// source of error
-        source: TimeourErr,
+        source: TimeoutErr,
     },
     /// HotShot timed out during round
     ViewTimeoutError {
@@ -89,104 +89,6 @@ pub enum HotShotError<TYPES: NodeType> {
     /// Internal value used to drive the state machine
     Continue,
 }
-/*
-// Implement Serialize for HotShotError
-impl<TYPES: NodeType> Serialize for HotShotError<TYPES> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            HotShotError::FailedToMessageLeader { source } => {
-                HotShotError::<TYPES>::FailedToMessageLeader { source: *source }
-                    .serialize(serializer)
-            }
-            HotShotError::FailedToBroadcast { source } => {
-                HotShotError::<TYPES>::FailedToBroadcast { source: *source }.serialize(serializer)
-            }
-            HotShotError::BlockError { source } => {
-                HotShotError::<TYPES>::BlockError { source: *source }.serialize(serializer)
-            }
-            HotShotError::NetworkFault { source } => {
-                HotShotError::<TYPES>::NetworkFault { source: *source }.serialize(serializer)
-            }
-            HotShotError::LeafNotFound {} => {
-                HotShotError::<TYPES>::LeafNotFound {}.serialize(serializer)
-            }
-            HotShotError::StorageError { source } => {
-                HotShotError::<TYPES>::StorageError { source: *source }.serialize(serializer)
-            }
-            HotShotError::InvalidState { context } => {
-                HotShotError::<TYPES>::InvalidState { context: *context }.serialize(serializer)
-            }
-            HotShotError::TimeoutError { source } => {
-                HotShotError::<TYPES>::TimeoutError { source: *source }.serialize(serializer)
-            }
-            HotShotError::ViewTimeoutError { view_number, state } => {
-                HotShotError::<TYPES>::ViewTimeoutError {
-                    view_number: *view_number,
-                    state: *state,
-                }
-                .serialize(serializer)
-            }
-            HotShotError::InsufficientValidSignatures {
-                num_valid_signatures,
-                threshold,
-            } => HotShotError::<TYPES>::InsufficientValidSignatures {
-                num_valid_signatures: *num_valid_signatures,
-                threshold: *threshold,
-            }
-            .serialize(serializer),
-            HotShotError::Misc { context } => {
-                HotShotError::<TYPES>::Misc { context: *context }.serialize(serializer)
-            }
-            HotShotError::Continue => HotShotError::<TYPES>::Continue.serialize(serializer),
-        }
-    }
-}
-
-// Implement Deserialize for HotShotError
-impl<'de, TYPES: NodeType> Deserialize<'de> for HotShotError<TYPES>
-where
-    TYPES: NodeType,
-    <TYPES::BlockPayload as BlockPayload>::Error: Deserialize<'de>,
-    crate::traits::network::NetworkError: Deserialize<'de>,
-    RoundTimedoutState: Deserialize<'de>,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let hotshot_error_enum: HotShotError<TYPES> = HotShotError::deserialize(deserializer)?;
-        match hotshot_error_enum {
-            HotShotError::FailedToMessageLeader { source } => {
-                Ok(HotShotError::FailedToMessageLeader { source })
-            }
-            HotShotError::FailedToBroadcast { source } => {
-                Ok(HotShotError::FailedToBroadcast { source })
-            }
-            HotShotError::BlockError { source } => Ok(HotShotError::BlockError { source }),
-            HotShotError::NetworkFault { source } => Ok(HotShotError::NetworkFault { source }),
-            HotShotError::LeafNotFound {} => Ok(HotShotError::LeafNotFound {}),
-            HotShotError::StorageError { source } => Ok(HotShotError::StorageError { source }),
-            HotShotError::InvalidState { context } => Ok(HotShotError::InvalidState { context }),
-            HotShotError::TimeoutError { source } => Ok(HotShotError::TimeoutError { source }),
-            HotShotError::ViewTimeoutError { view_number, state } => {
-                Ok(HotShotError::ViewTimeoutError { view_number, state })
-            }
-            HotShotError::InsufficientValidSignatures {
-                num_valid_signatures,
-                threshold,
-            } => Ok(HotShotError::InsufficientValidSignatures {
-                num_valid_signatures,
-                threshold,
-            }),
-            HotShotError::Misc { context } => Ok(HotShotError::Misc { context }),
-            HotShotError::Continue => Ok(HotShotError::Continue),
-        }
-    }
-}
-*/
 /// Contains information about what the state of the hotshot-consensus was when a round timed out
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
