@@ -58,6 +58,26 @@ impl<TYPES: NodeType> LeafInfo<TYPES> {
 /// The chain of decided leaves with its corresponding state and VID info.
 pub type LeafChain<TYPES> = Vec<LeafInfo<TYPES>>;
 
+pub mod error_adaptor {
+    //use core::fmt;
+    // use std::fmt;
+
+    use super::*;
+    use serde::{de::Deserializer, ser::Serializer};
+    pub fn serialize<S: Serializer, TYPES: NodeType>(
+        elem: &Arc<HotShotError<TYPES>>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&format!("{}", elem))
+    }
+
+    pub fn deserialize<'de, D: Deserializer<'de>, TYPES: NodeType>(
+        deserializer: D,
+    ) -> Result<Arc<HotShotError<TYPES>>, D::Error> {
+        let str = String::deserialize(deserializer)?;
+        Ok(Arc::new(HotShotError::Misc { context: str }))
+    }
+}
 /// The type and contents of a status event emitted by a `HotShot` instance
 ///
 /// This enum does not include metadata shared among all variants, such as the stage and view
@@ -69,6 +89,7 @@ pub enum EventType<TYPES: NodeType> {
     /// A view encountered an error and was interrupted
     Error {
         /// The underlying error
+        #[serde(with = "error_adaptor")]
         error: Arc<HotShotError<TYPES>>,
     },
     /// A new decision event was issued

@@ -81,39 +81,39 @@ pub enum TransmitType {
 }
 
 // Define the trait
-#[typetag::serde(tag = "type")]
-pub trait MyTraitSerde:
-    std::error::Error + Send + Sync + 'static + AsErrorSource + StdError
-{
-}
+// #[typetag::serde(tag = "type")]
+// pub trait MyTraitSerde:
+//     std::error::Error + Send + Sync + 'static + AsErrorSource + StdError
+// {
+// }
 
-#[derive(Debug, Snafu, Clone, Copy, Serialize, Deserialize)]
-#[snafu(visibility(pub))]
-pub enum BincodeErr {
-    BincodeError,
-}
-#[derive(Debug)]
-pub struct BincodeError(bincode::Error);
-#[derive(Debug, Snafu, Clone, Copy, Serialize, Deserialize)]
-#[snafu(visibility(pub))]
-pub enum TimeoutErr {
-    Timeouterr,
-}
-#[derive(Debug)]
-pub struct Timeouterr(TimeoutError);
+// #[derive(Debug, Snafu, Clone, Copy, Serialize, Deserialize)]
+// #[snafu(visibility(pub))]
+// pub enum BincodeErr {
+//     BincodeError,
+// }
+// #[derive(Debug)]
+// pub struct BincodeError(bincode::Error);
+// #[derive(Debug, Snafu, Clone, Copy, Serialize, Deserialize)]
+// #[snafu(visibility(pub))]
+// pub enum TimeoutErr {
+//     Timeouterr,
+// }
+// #[derive(Debug)]
+// pub struct Timeouterr(TimeoutError);
 /// Error type for networking
-#[derive(Debug, Snafu, Serialize, Deserialize)]
+#[derive(Debug, Snafu)]
 #[snafu(visibility(pub))]
 pub enum NetworkError {
     /// Libp2p specific errors
     Libp2p {
         /// source of error
-        source: Box<dyn MyTraitSerde>,
+        source: Box<dyn std::error::Error + Send + Sync>,
     },
     /// collection of libp2p secific errors
     Libp2pMulti {
         /// sources of errors
-        sources: Vec<Box<dyn MyTraitSerde>>,
+        sources: Vec<Box<dyn std::error::Error + Send + Sync>>,
     },
     /// memory network specific errors
     MemoryNetwork {
@@ -145,17 +145,17 @@ pub enum NetworkError {
     /// Failed to serialize a network message
     FailedToSerialize {
         /// Originating bincode error
-        source: BincodeErr,
+        source: bincode::Error,
     },
     /// Failed to deserealize a network message
     FailedToDeserialize {
         /// originating bincode error
-        source: BincodeErr,
+        source: bincode::Error,
     },
     /// A timeout occurred
     Timeout {
         /// Source of error
-        source: TimeoutErr,
+        source: TimeoutError,
     },
     /// Error sending output to consumer of NetworkingImplementation
     /// TODO this should have more information
