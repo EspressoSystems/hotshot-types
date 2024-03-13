@@ -59,9 +59,6 @@ impl<TYPES: NodeType> LeafInfo<TYPES> {
 pub type LeafChain<TYPES> = Vec<LeafInfo<TYPES>>;
 
 pub mod error_adaptor {
-    //use core::fmt;
-    // use std::fmt;
-
     use super::*;
     use serde::{de::Deserializer, ser::Serializer};
     pub fn serialize<S: Serializer, TYPES: NodeType>(
