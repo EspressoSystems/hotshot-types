@@ -9,6 +9,8 @@ use crate::{
 };
 
 use std::sync::Arc;
+use crate::data::VidDisperseShare;
+
 /// A status event emitted by a `HotShot` instance
 ///
 /// This includes some metadata, such as the stage and view number that the event was generated in,
@@ -31,7 +33,7 @@ pub struct LeafInfo<TYPES: NodeType> {
     /// Optional application-specific state delta.
     pub delta: Option<Arc<<<TYPES as NodeType>::ValidatedState as ValidatedState<TYPES>>::Delta>>,
     /// Optional VID disperse data.
-    pub vid: Option<VidDisperse<TYPES>>,
+    pub vid: Option<VidDisperseShare<TYPES>>,
 }
 
 impl<TYPES: NodeType> LeafInfo<TYPES> {
@@ -40,7 +42,7 @@ impl<TYPES: NodeType> LeafInfo<TYPES> {
         leaf: Leaf<TYPES>,
         state: Arc<<TYPES as NodeType>::ValidatedState>,
         delta: Option<Arc<<<TYPES as NodeType>::ValidatedState as ValidatedState<TYPES>>::Delta>>,
-        vid: Option<VidDisperse<TYPES>>,
+        vid: Option<VidDisperseShare<TYPES>>,
     ) -> Self {
         Self {
             leaf,

@@ -22,6 +22,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 use tracing::error;
+use crate::data::VidDisperseShare;
 
 /// A type alias for `HashMap<Commitment<T>, T>`
 type CommitmentMap<T> = HashMap<Commitment<T>, T>;
@@ -41,7 +42,7 @@ pub struct Consensus<TYPES: NodeType> {
     /// In the future we will need a different struct similar to VidDisperse except
     /// it stores only one share.
     /// TODO <https://github.com/EspressoSystems/HotShot/issues/1732>
-    pub vid_shares: BTreeMap<TYPES::Time, Proposal<TYPES, VidDisperse<TYPES>>>,
+    pub vid_shares: BTreeMap<TYPES::Time, Proposal<TYPES, VidDisperseShare<TYPES>>>,
 
     /// All the DA certs we've received for current and future views.
     /// view -> DA cert

@@ -4,7 +4,7 @@
 //! `HotShot` nodes can send among themselves.
 
 use crate::constants::Version;
-use crate::data::{QuorumProposal, UpgradeProposal};
+use crate::data::{QuorumProposal, UpgradeProposal, VidDisperseShare};
 use crate::simple_certificate::{
     DACertificate, ViewSyncCommitCertificate2, ViewSyncFinalizeCertificate2,
     ViewSyncPreCommitCertificate2,
@@ -191,7 +191,7 @@ pub enum CommitteeConsensusMessage<TYPES: NodeType> {
     ///
     /// Like [`DAProposal`]. Use `Msg` suffix to distinguish from [`VidDisperse`].
     /// TODO this variant should not be a [`CommitteeConsensusMessage`] because <https://github.com/EspressoSystems/HotShot/issues/1696>
-    VidDisperseMsg(Proposal<TYPES, VidDisperse<TYPES>>),
+    VidDisperseMsg(Proposal<TYPES, VidDisperseShare<TYPES>>),
 }
 
 /// Messages for sequencing consensus.

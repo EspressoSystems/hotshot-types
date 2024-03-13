@@ -35,6 +35,9 @@ use std::{
     hash::Hash,
     sync::Arc,
 };
+use std::marker::PhantomData;
+use tracing::error;
+use crate::message::Proposal;
 
 /// Type-safe wrapper around `u64` so we know the thing we're talking about is a view number.
 #[derive(
@@ -169,6 +172,66 @@ impl<TYPES: NodeType> VidDisperse<TYPES> {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
+pub struct VidDisperseShare<TYPES: NodeType> {
+    /// The view number for which this VID data is intended
+    pub view_number: TYPES::Time,
+    /// Block payload commitment
+    pub payload_commitment: VidCommitment,
+    /// A storage node's key and its corresponding VID share
+    pub share: VidShare,
+    /// VID common data sent to all storage nodes
+    pub common: VidCommon,
+    /// a public key of the share recipient
+    pub recipient_key: TYPES::SignatureKey,
+}
+
+impl<TYPES: NodeType> VidDisperseShare<TYPES> {
+    /// Create a vector of `VidDisperseShare` from `VidDisperse`
+    pub fn from_vid_disperse(
+        vid_disperse: VidDisperse<TYPES>,
+    ) -> Vec<Self> {
+        vid_disperse.shares.into_iter().map(|(recipient_key, share)| {
+            VidDisperseShare {
+                share,
+                recipient_key,
+                view_number: vid_disperse.view_number,
+                common: vid_disperse.common.clone(),
+                payload_commitment: vid_disperse.payload_commitment,
+            }
+        }).collect()
+    }
+
+    /// Create a vector of `Proposal`s of `VidDisperseShare`
+    pub fn from_vid_disperse_proposal(
+        vid_disperse_proposal: Proposal<TYPES, VidDisperse<TYPES>>,
+        private_key: &<TYPES::SignatureKey as SignatureKey>::PrivateKey,
+    ) -> Vec<Option<Proposal<TYPES, Self>>> {
+        Self::from_vid_disperse(vid_disperse_proposal.data).into_iter().map(|vid_disperse_share| {
+            vid_disperse_share.to_proposal(private_key)
+        }).collect()
+    }
+
+    /// Consume `self` and return a `Proposal`
+    pub fn to_proposal(
+        self,
+        private_key: &<TYPES::SignatureKey as SignatureKey>::PrivateKey,
+    ) -> Option<Proposal<TYPES, Self>> {
+        let Ok(signature) = TYPES::SignatureKey::sign(
+            private_key,
+            self.payload_commitment.as_ref().as_ref(),
+        ) else {
+            error!("VID: failed to sign dispersal share payload");
+            return None;
+        };
+        Some(Proposal {
+            signature,
+            _pd: PhantomData,
+            data: self
+        })
+    }
+}
+
 /// Proposal to append a block.
 #[derive(custom_debug::Debug, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
 #[serde(bound(deserialize = ""))]
@@ -199,6 +262,12 @@ impl<TYPES: NodeType> HasViewNumber<TYPES> for DAProposal<TYPES> {
 }
 
 impl<TYPES: NodeType> HasViewNumber<TYPES> for VidDisperse<TYPES> {
+    fn get_view_number(&self) -> TYPES::Time {
+        self.view_number
+    }
+}
+
+impl<TYPES: NodeType> HasViewNumber<TYPES> for VidDisperseShare<TYPES> {
     fn get_view_number(&self) -> TYPES::Time {
         self.view_number
     }
