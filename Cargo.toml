@@ -14,7 +14,7 @@ ark-bn254 = "0.4"
 ark-ec = "0.4"
 ark-ed-on-bn254 = "0.4"
 ark-ff = "0.4"
-ark-serialize = { version = "0.4", features = [ "derive" ] }
+ark-serialize = { version = "0.4", features = ["derive"] }
 ark-std = { version = "0.4", default-features = false }
 async-compatibility-layer = { git = "https://github.com/EspressoSystems/async-compatibility-layer.git", tag = "1.4.1", default-features = false, features = [
         "logging-utils",
@@ -31,7 +31,8 @@ blake3 = "1.5"
 commit = { git = "https://github.com/EspressoSystems/commit" }
 custom_debug = "0.5"
 digest = "0.10"
-either = { version = "1.10", features = [ "serde" ] }
+either = { version = "1.10", features = ["serde"] }
+erased-serde = "0.4"
 espresso-systems-common = { git = "https://github.com/espressosystems/espresso-systems-common", tag = "0.4.1" }
 ethereum-types = { version = "0.14.1", features = ["impl-serde"] }
 futures = "0.3.30"
@@ -40,7 +41,9 @@ futures = "0.3.30"
 # https://github.com/EspressoSystems/HotShot/issues/1850
 generic-array = { version = "0.14.7", features = ["serde"] }
 
-jf-primitives = { git = "https://github.com/EspressoSystems/jellyfish", tag = "0.4.1", features = [ "test-srs" ] }
+jf-primitives = { git = "https://github.com/EspressoSystems/jellyfish", tag = "0.4.1", features = [
+        "test-srs",
+] }
 jf-plonk = { git = "https://github.com/EspressoSystems/jellyfish", tag = "0.4.1" }
 jf-utils = { git = "https://github.com/espressosystems/jellyfish", tag = "0.4.1" }
 lazy_static = "1.4.0"
@@ -53,6 +56,7 @@ tagged-base64 = { git = "https://github.com/EspressoSystems/tagged-base64", tag 
 time = "0.3.34"
 tracing = "0.1.40"
 typenum = "1.17.0"
+typetag = "0.2"
 derivative = "2.2.0"
 displaydoc = { version = "0.2.3", default-features = false }
 dyn-clone = { git = "https://github.com/dtolnay/dyn-clone", tag = "1.0.17" }

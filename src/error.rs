@@ -3,22 +3,22 @@
 //! This module provides [`HotShotError`], which is an enum representing possible faults that can
 //! occur while interacting with this crate.
 
+use crate::traits::network::TimeourErr;
 use crate::traits::{
     block_contents::BlockPayload, node_implementation::NodeType, storage::StorageError,
 };
+#[cfg(async_executor_impl = "async-std")]
+use async_std::future::TimeoutError;
 use serde::{Deserialize, Serialize};
 use snafu::Snafu;
 use std::num::NonZeroU64;
-
-#[cfg(async_executor_impl = "async-std")]
-use async_std::future::TimeoutError;
 #[cfg(async_executor_impl = "tokio")]
 use tokio::time::error::Elapsed as TimeoutError;
 #[cfg(not(any(async_executor_impl = "async-std", async_executor_impl = "tokio")))]
 compile_error! {"Either config option \"async-std\" or \"tokio\" must be enabled for this crate."}
 
 /// Error type for `HotShot`
-#[derive(Debug, Snafu)]
+#[derive(Debug, Snafu, Serialize, Deserialize)]
 #[snafu(visibility(pub))]
 #[non_exhaustive]
 pub enum HotShotError<TYPES: NodeType> {
@@ -62,7 +62,7 @@ pub enum HotShotError<TYPES: NodeType> {
     /// HotShot timed out waiting for msgs
     TimeoutError {
         /// source of error
-        source: TimeoutError,
+        source: TimeourErr,
     },
     /// HotShot timed out during round
     ViewTimeoutError {
@@ -89,7 +89,7 @@ pub enum HotShotError<TYPES: NodeType> {
     /// Internal value used to drive the state machine
     Continue,
 }
-
+/*
 // Implement Serialize for HotShotError
 impl<TYPES: NodeType> Serialize for HotShotError<TYPES> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -186,7 +186,7 @@ where
         }
     }
 }
-
+*/
 /// Contains information about what the state of the hotshot-consensus was when a round timed out
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
