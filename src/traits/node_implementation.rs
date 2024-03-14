@@ -50,6 +50,9 @@ pub trait NodeImplementation<TYPES: NodeType>:
     type QuorumNetwork: ConnectedNetwork<Message<TYPES>, TYPES::SignatureKey>;
     /// Network for those in the DA committee
     type CommitteeNetwork: ConnectedNetwork<Message<TYPES>, TYPES::SignatureKey>;
+
+    /// Storage for DA layer interactions
+    type BlockStorage: BlockStorage<TYPES>;
 }
 
 /// extra functions required on a node implementation to be usable by hotshot-testing
