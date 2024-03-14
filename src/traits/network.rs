@@ -27,6 +27,7 @@ use rand::{
 use serde::{Deserialize, Serialize};
 use snafu::Snafu;
 use std::{collections::BTreeSet, fmt::Debug, hash::Hash, sync::Arc, time::Duration};
+use versioned_binary_serialization::version::StaticVersionType;
 
 /// for any errors we decide to add to memory network
 #[derive(Debug, Snafu, Serialize, Deserialize)]
@@ -304,23 +305,30 @@ pub trait ConnectedNetwork<M: NetworkMsg, K: SignatureKey + 'static>:
 
     /// broadcast message to some subset of nodes
     /// blocking
-    async fn broadcast_message(
+    async fn broadcast_message<VER: StaticVersionType>(
         &self,
         message: M,
         recipients: BTreeSet<K>,
+        bind_version: VER,
     ) -> Result<(), NetworkError>;
 
     /// broadcast a message only to a DA committee
     /// blocking
-    async fn da_broadcast_message(
+    async fn da_broadcast_message<VER: StaticVersionType>(
         &self,
         message: M,
         recipients: BTreeSet<K>,
+        bind_version: VER,
     ) -> Result<(), NetworkError>;
 
     /// Sends a direct message to a specific node
     /// blocking
-    async fn direct_message(&self, message: M, recipient: K) -> Result<(), NetworkError>;
+    async fn direct_message<VER: StaticVersionType>(
+        &self,
+        message: M,
+        recipient: K,
+        bind_version: VER,
+    ) -> Result<(), NetworkError>;
 
     /// Receive one or many messages from the underlying network.
     ///
@@ -330,10 +338,11 @@ pub trait ConnectedNetwork<M: NetworkMsg, K: SignatureKey + 'static>:
 
     /// Ask request the network for some data.  Returns the request ID for that data,
     /// The ID returned can be used for cancelling the request
-    async fn request_data<TYPES: NodeType>(
+    async fn request_data<TYPES: NodeType, VER: StaticVersionType>(
         &self,
         _request: M,
         _recipient: K,
+        _bind_version: VER,
     ) -> Result<ResponseMessage<TYPES>, NetworkError> {
         Err(NetworkError::UnimplementedFeature)
     }
@@ -344,7 +353,10 @@ pub trait ConnectedNetwork<M: NetworkMsg, K: SignatureKey + 'static>:
     /// with a return channel to send the response back to.
     ///
     /// Returns `None`` if network does not support handling requests
-    async fn spawn_request_receiver_task(&self) -> Option<mpsc::Receiver<(M, ResponseChannel<M>)>> {
+    async fn spawn_request_receiver_task<VER: StaticVersionType>(
+        &self,
+        _bind_version: VER,
+    ) -> Option<mpsc::Receiver<(M, ResponseChannel<M>)>> {
         None
     }
 
