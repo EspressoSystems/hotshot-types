@@ -3,21 +3,22 @@
 //! This module provides [`HotShotError`], which is an enum representing possible faults that can
 //! occur while interacting with this crate.
 
+//use crate::traits::network::TimeoutErr;
 use crate::traits::{
     block_contents::BlockPayload, node_implementation::NodeType, storage::StorageError,
 };
-use snafu::Snafu;
-use std::num::NonZeroU64;
-
 #[cfg(async_executor_impl = "async-std")]
 use async_std::future::TimeoutError;
+use serde::{Deserialize, Serialize};
+use snafu::Snafu;
+use std::num::NonZeroU64;
 #[cfg(async_executor_impl = "tokio")]
 use tokio::time::error::Elapsed as TimeoutError;
 #[cfg(not(any(async_executor_impl = "async-std", async_executor_impl = "tokio")))]
 compile_error! {"Either config option \"async-std\" or \"tokio\" must be enabled for this crate."}
 
 /// Error type for `HotShot`
-#[derive(Snafu, Debug)]
+#[derive(Debug, Snafu)]
 #[snafu(visibility(pub))]
 #[non_exhaustive]
 pub enum HotShotError<TYPES: NodeType> {
@@ -88,9 +89,8 @@ pub enum HotShotError<TYPES: NodeType> {
     /// Internal value used to drive the state machine
     Continue,
 }
-
 /// Contains information about what the state of the hotshot-consensus was when a round timed out
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub enum RoundTimedoutState {
     /// Leader is in a Prepare phase and is waiting for a HighQC
