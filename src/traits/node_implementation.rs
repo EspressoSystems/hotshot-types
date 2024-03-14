@@ -255,5 +255,5 @@ pub trait NodeType:
     type Membership: Membership<Self>;
 
     /// Storage for DA layer interactions
-    type Storage: BlockStorage<Self>;
+    type BlockStorage: BlockStorage<Self>;
 }
