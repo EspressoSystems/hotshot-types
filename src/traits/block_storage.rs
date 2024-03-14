@@ -3,6 +3,7 @@
 //! This modules provides the [`BlockStorage`] trait.
 //!
 
+use async_trait::async_trait;
 use snafu::Snafu;
 
 use crate::{
@@ -31,6 +32,7 @@ where
 }
 
 /// Abstraction for storing the contents of DA proposals and VID shares.
+#[async_trait]
 pub trait BlockStorage<TYPES>: Clone + Send + Sync + Sized + 'static
 where
     TYPES: NodeType + 'static,
