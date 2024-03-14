@@ -29,8 +29,11 @@ pub const VERSION_0_1: Version = Version {
     minor: VERSION_MIN,
 };
 
+/// Type for protocol static version 0.1.
+pub type Version01 = StaticVersion<VERSION_MAJ, VERSION_MIN>;
+
 /// Constant for protocol static version 0.1.
-pub const STATIC_VER_0_1: StaticVersion<VERSION_MAJ, VERSION_MIN> = StaticVersion;
+pub const STATIC_VER_0_1: Version01 = StaticVersion {};
 
 /// Default Channel Size for consensus event sharing
 pub const EVENT_CHANNEL_SIZE: usize = 100_000;
@@ -39,5 +42,11 @@ pub const EVENT_CHANNEL_SIZE: usize = 100_000;
 /// The Web CDN is not, strictly speaking, bound to the network; it can have its own versioning.
 /// Web Server CDN Version (major)
 pub const WEB_SERVER_MAJOR_VERSION: u16 = 0;
-/// Orchestrator Version (minor)
+/// Web Server CDN Version (minor)
 pub const WEB_SERVER_MINOR_VERSION: u16 = 1;
+
+/// Type for Web Server CDN Version
+pub type WebServerVersion = StaticVersion<WEB_SERVER_MAJOR_VERSION, WEB_SERVER_MINOR_VERSION>;
+
+/// Constant for Web Server CDN Version
+pub const WEB_SERVER_VERSION: WebServerVersion = StaticVersion {};

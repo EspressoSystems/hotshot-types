@@ -56,7 +56,7 @@ tagged-base64 = { git = "https://github.com/EspressoSystems/tagged-base64", tag 
 time = "0.3.34"
 tracing = "0.1.40"
 typenum = "1.17.0"
-versioned-binary-serialization = { git = "https://github.com/EspressoSystems/versioned-binary-serialization.git", tag = "0.1.1" }
+versioned-binary-serialization = { git = "https://github.com/EspressoSystems/versioned-binary-serialization.git", tag = "0.1.2" }
 derivative = "2.2.0"
 displaydoc = { version = "0.2.3", default-features = false }
 dyn-clone = { git = "https://github.com/dtolnay/dyn-clone", tag = "1.0.17" }
