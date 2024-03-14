@@ -5,6 +5,7 @@
 
 use super::{
     block_contents::{BlockHeader, TestableBlock, Transaction},
+    block_storage::BlockStorage,
     election::ElectionConfig,
     network::{ConnectedNetwork, NetworkReliability, TestableNetworkingImplementation},
     states::TestableState,
@@ -252,4 +253,7 @@ pub trait NodeType:
 
     /// Membership used for this implementation
     type Membership: Membership<Self>;
+
+    /// Storage for DA layer interactions
+    type Storage: BlockStorage<Self>;
 }
