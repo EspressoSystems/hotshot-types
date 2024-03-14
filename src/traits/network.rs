@@ -305,7 +305,7 @@ pub trait ConnectedNetwork<M: NetworkMsg, K: SignatureKey + 'static>:
 
     /// broadcast message to some subset of nodes
     /// blocking
-    async fn broadcast_message<VER: StaticVersionType>(
+    async fn broadcast_message<VER: StaticVersionType + 'static>(
         &self,
         message: M,
         recipients: BTreeSet<K>,
@@ -314,7 +314,7 @@ pub trait ConnectedNetwork<M: NetworkMsg, K: SignatureKey + 'static>:
 
     /// broadcast a message only to a DA committee
     /// blocking
-    async fn da_broadcast_message<VER: StaticVersionType>(
+    async fn da_broadcast_message<VER: StaticVersionType + 'static>(
         &self,
         message: M,
         recipients: BTreeSet<K>,
@@ -323,7 +323,7 @@ pub trait ConnectedNetwork<M: NetworkMsg, K: SignatureKey + 'static>:
 
     /// Sends a direct message to a specific node
     /// blocking
-    async fn direct_message<VER: StaticVersionType>(
+    async fn direct_message<VER: StaticVersionType + 'static>(
         &self,
         message: M,
         recipient: K,
@@ -338,7 +338,7 @@ pub trait ConnectedNetwork<M: NetworkMsg, K: SignatureKey + 'static>:
 
     /// Ask request the network for some data.  Returns the request ID for that data,
     /// The ID returned can be used for cancelling the request
-    async fn request_data<TYPES: NodeType, VER: StaticVersionType>(
+    async fn request_data<TYPES: NodeType, VER: StaticVersionType + 'static>(
         &self,
         _request: M,
         _recipient: K,
@@ -353,7 +353,7 @@ pub trait ConnectedNetwork<M: NetworkMsg, K: SignatureKey + 'static>:
     /// with a return channel to send the response back to.
     ///
     /// Returns `None`` if network does not support handling requests
-    async fn spawn_request_receiver_task<VER: StaticVersionType>(
+    async fn spawn_request_receiver_task<VER: StaticVersionType + 'static>(
         &self,
         _bind_version: VER,
     ) -> Option<mpsc::Receiver<(M, ResponseChannel<M>)>> {
