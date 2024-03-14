@@ -202,16 +202,6 @@ impl<TYPES: NodeType> VidDisperseShare<TYPES> {
         }).collect()
     }
 
-    /// Create a vector of `Proposal`s of `VidDisperseShare`
-    pub fn from_vid_disperse_proposal(
-        vid_disperse_proposal: Proposal<TYPES, VidDisperse<TYPES>>,
-        private_key: &<TYPES::SignatureKey as SignatureKey>::PrivateKey,
-    ) -> Vec<Option<Proposal<TYPES, Self>>> {
-        Self::from_vid_disperse(vid_disperse_proposal.data).into_iter().map(|vid_disperse_share| {
-            vid_disperse_share.to_proposal(private_key)
-        }).collect()
-    }
-
     /// Consume `self` and return a `Proposal`
     pub fn to_proposal(
         self,
@@ -229,6 +219,29 @@ impl<TYPES: NodeType> VidDisperseShare<TYPES> {
             _pd: PhantomData,
             data: self
         })
+    }
+
+    /// Create `VidDisperse` out of an iterator to `VidDisperseShare`s
+    pub fn to_vid_disperse<'a, I>(mut it: I) -> Option<VidDisperse<TYPES>>
+    where
+        I: Iterator<Item=&'a VidDisperseShare<TYPES>>
+    {
+        let first_vid_disperse_share = it.next()?.clone();
+        let mut share_map = BTreeMap::new();
+        share_map.insert(
+            first_vid_disperse_share.recipient_key,
+            first_vid_disperse_share.share);
+        let mut vid_disperse = VidDisperse {
+            view_number: first_vid_disperse_share.view_number,
+            payload_commitment: first_vid_disperse_share.payload_commitment,
+            common: first_vid_disperse_share.common,
+            shares: share_map,
+        };
+        it.map(|vid_disperse_share| vid_disperse
+            .shares
+            .insert(vid_disperse_share.recipient_key.clone(), vid_disperse_share.share.clone())
+        );
+        Some(vid_disperse)
     }
 }
 

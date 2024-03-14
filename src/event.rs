@@ -33,7 +33,7 @@ pub struct LeafInfo<TYPES: NodeType> {
     /// Optional application-specific state delta.
     pub delta: Option<Arc<<<TYPES as NodeType>::ValidatedState as ValidatedState<TYPES>>::Delta>>,
     /// Optional VID disperse data.
-    pub vid: Option<VidDisperseShare<TYPES>>,
+    pub vid: Option<VidDisperse<TYPES>>,
 }
 
 impl<TYPES: NodeType> LeafInfo<TYPES> {
@@ -42,7 +42,7 @@ impl<TYPES: NodeType> LeafInfo<TYPES> {
         leaf: Leaf<TYPES>,
         state: Arc<<TYPES as NodeType>::ValidatedState>,
         delta: Option<Arc<<<TYPES as NodeType>::ValidatedState as ValidatedState<TYPES>>::Delta>>,
-        vid: Option<VidDisperseShare<TYPES>>,
+        vid: Option<VidDisperse<TYPES>>,
     ) -> Self {
         Self {
             leaf,
