@@ -8,7 +8,9 @@
 //! This crate and all downstream crates should talk to the VID scheme only
 //! via the traits exposed here.
 
-use ark_bls12_381::Bls12_381;
+use ark_bn254::Bn254;
+#[cfg(feature = "gpu-vid")]
+use jf_primitives::vid::advz::AdvzGPU;
 use jf_primitives::{
     pcs::{
         checked_fft_size,
@@ -60,7 +62,7 @@ pub fn vid_scheme(num_storage_nodes: usize) -> VidSchemeType {
 
     // TODO panic, return `Result`, or make `new` infallible upstream (eg. by panicking)?
     #[allow(clippy::panic)]
-    VidSchemeType(Advz::new(chunk_size, num_storage_nodes, multiplicity, &*KZG_SRS).unwrap_or_else(|err| panic!("advz construction failure:\n\t(num_storage nodes,chunk_size,multiplicity)=({num_storage_nodes},{chunk_size},{multiplicity})\n\terror: : {err}")))
+    VidSchemeType(VidInternal::new(chunk_size, num_storage_nodes, multiplicity, &*KZG_SRS).unwrap_or_else(|err| panic!("advz construction failure:\n\t(num_storage nodes,chunk_size,multiplicity)=({num_storage_nodes},{chunk_size},{multiplicity})\n\terror: : {err}")))
 }
 
 /// VID commitment type
@@ -70,9 +72,16 @@ pub type VidCommon = <VidSchemeType as VidScheme>::Common;
 /// VID share type
 pub type VidShare = <VidSchemeType as VidScheme>::Share;
 
+#[cfg(not(feature = "gpu-vid"))]
+/// Internal Jellyfish VID scheme
+type VidInternal = Advz<E, H>;
+#[cfg(feature = "gpu-vid")]
+/// Internal Jellyfish VID scheme
+type VidInternal = AdvzGPU<'static, E, H>;
+
 /// Newtype wrapper for a VID scheme type that impls
 /// [`VidScheme`], [`PayloadProver`], [`Precomputable`].
-pub struct VidSchemeType(Advz<E, H>);
+pub struct VidSchemeType(VidInternal);
 
 /// Newtype wrapper for a large payload range proof.
 ///
@@ -121,7 +130,7 @@ lazy_static! {
 }
 
 /// Private type alias for the EC pairing type parameter for [`Advz`].
-type E = Bls12_381;
+type E = Bn254;
 /// Private type alias for the hash type parameter for [`Advz`].
 type H = Sha256;
 
@@ -135,14 +144,14 @@ impl VidScheme for VidSchemeType {
     type Share = <Advz<E, H> as VidScheme>::Share;
     type Common = <Advz<E, H> as VidScheme>::Common;
 
-    fn commit_only<B>(&self, payload: B) -> VidResult<Self::Commit>
+    fn commit_only<B>(&mut self, payload: B) -> VidResult<Self::Commit>
     where
         B: AsRef<[u8]>,
     {
         self.0.commit_only(payload)
     }
 
-    fn disperse<B>(&self, payload: B) -> VidResult<VidDisperse<Self>>
+    fn disperse<B>(&mut self, payload: B) -> VidResult<VidDisperse<Self>>
     where
         B: AsRef<[u8]>,
     {
@@ -251,7 +260,7 @@ impl Precomputable for VidSchemeType {
 /// - `impl VidDisperse<VidSchemeType> {...}`
 /// and similarly for `Statement`.
 /// Thus, we accomplish type conversion via functions.
-fn vid_disperse_conversion(vid_disperse: VidDisperse<Advz<E, H>>) -> VidDisperse<VidSchemeType> {
+fn vid_disperse_conversion(vid_disperse: VidDisperse<VidInternal>) -> VidDisperse<VidSchemeType> {
     VidDisperse {
         shares: vid_disperse.shares,
         common: vid_disperse.common,
@@ -260,7 +269,7 @@ fn vid_disperse_conversion(vid_disperse: VidDisperse<Advz<E, H>>) -> VidDisperse
 }
 
 /// Convert a [`Statement<'_, VidSchemeType>`] to a [`Statement<'_, Advz<E, H>>`].
-fn stmt_conversion(stmt: Statement<'_, VidSchemeType>) -> Statement<'_, Advz<E, H>> {
+fn stmt_conversion(stmt: Statement<'_, VidSchemeType>) -> Statement<'_, VidInternal> {
     Statement {
         payload_subslice: stmt.payload_subslice,
         range: stmt.range,
