@@ -1,0 +1,122 @@
+name: Build and test
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+  schedule:
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ (github.ref == 'refs/heads/main' && github.run_number) || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        just_variants:
+          - async-std
+          - tokio
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout repository
+
+      - run: rustup toolchain install stable --profile minimal
+
+      - uses: Swatinem/rust-cache@v2
+        name: Enable Rust caching
+        with:
+          shared-key: ""
+          prefix-key: ${{ matrix.just_variants }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+
+      - name: Install just
+        run: |
+          wget https://github.com/casey/just/releases/download/1.14.0/just-1.14.0-x86_64-unknown-linux-musl.tar.gz
+          tar -vxf just-1.14.0-x86_64-unknown-linux-musl.tar.gz just
+          sudo cp just /usr/bin/just
+
+      - name: Run tests
+        run: |
+          just ${{ matrix.just_variants }} test-ci
+        timeout-minutes: 60
+        env:
+          RUST_BACKTRACE: full
+
+  build:
+    strategy:
+      matrix:
+        just_variants:
+          - async-std
+          - tokio
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout repository
+
+      - run: rustup toolchain install stable --profile minimal
+
+      - uses: Swatinem/rust-cache@v2
+        name: Enable Rust caching
+        with:
+          shared-key: ""
+          prefix-key: ${{ matrix.just_variants }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+
+      - name: Install just
+        run: |
+          wget https://github.com/casey/just/releases/download/1.14.0/just-1.14.0-x86_64-unknown-linux-musl.tar.gz
+          tar -vxf just-1.14.0-x86_64-unknown-linux-musl.tar.gz just
+          sudo cp just /usr/bin/just
+
+      - name: Build all crates in workspace
+        run: just ${{ matrix.just_variants }} build
+
+  build-hotshot:
+    strategy:
+      matrix:
+        just_variants:
+          - async-std
+          - tokio
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    container: ghcr.io/espressosystems/devops-rust:stable
+    steps:
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        name: Enable Rust caching
+        with:
+          shared-key: ""
+          prefix-key: arm-${{ matrix.just_variants }}
+
+      - name: Install just
+        run: |
+          wget https://github.com/casey/just/releases/download/1.14.0/just-1.14.0-x86_64-unknown-linux-musl.tar.gz
+          tar -vxf just-1.14.0-x86_64-unknown-linux-musl.tar.gz just
+          sudo cp just /usr/bin/just
+
+      # Attempt to build HotShot with the current branch of hotshot-types.
+      #
+      # Note: it is expected that changes may frequently break HotShot. 
+      # This is intended to be purely informational and should not run on main. 
+      # The goal is just to ensure that authors are aware if a merge would break HotShot.
+      - name: Build HotShot
+        run: |
+          git clone https://github.com/EspressoSystems/HotShot
+          cd HotShot
+          echo '\n[patch."https://github.com/EspressoSystems/hotshot-types"]\nhotshot-types = { git = "https://github.com/EspressoSystems/hotshot-types", rev = "${{ github.sha }}" }' >> Cargo.toml
+          just ${{ matrix.just_variants }} build
