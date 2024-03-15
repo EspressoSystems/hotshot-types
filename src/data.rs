@@ -4,7 +4,9 @@
 //! `HotShot`'s version of a block, and proposals, messages upon which to reach the consensus.
 
 use crate::{
-    simple_certificate::{QuorumCertificate, TimeoutCertificate, UpgradeCertificate},
+    simple_certificate::{
+        QuorumCertificate, TimeoutCertificate, UpgradeCertificate, ViewSyncFinalizeCertificate2,
+    },
     simple_vote::UpgradeProposalData,
     traits::{
         block_contents::{
@@ -264,6 +266,10 @@ pub struct QuorumProposal<TYPES: NodeType> {
     /// Possible upgrade certificate, which the leader may optionally attach.
     pub upgrade_certificate: Option<UpgradeCertificate<TYPES>>,
 
+    /// Possible view sync certificate. Only present if the justify_qc and timeout_cert are not
+    /// present.
+    pub view_sync_certificate: Option<ViewSyncFinalizeCertificate2<TYPES>>,
+
     /// the propser id
     pub proposer_id: TYPES::SignatureKey,
 }
@@ -299,7 +305,7 @@ impl<TYPES: NodeType> HasViewNumber<TYPES> for UpgradeProposal<TYPES> {
 }
 
 /// The error type for block and its transactions.
-#[derive(Snafu, Debug)]
+#[derive(Snafu, Debug, Serialize, Deserialize)]
 pub enum BlockError {
     /// Invalid block header.
     InvalidBlockHeader,
