@@ -33,5 +33,6 @@ pub enum ProposalType<TYPES: NodeType> {
 #[async_trait]
 pub trait BlockStorage<TYPES: NodeType>: Send + Sync + Clone {
     async fn append(&self, proposal: &ProposalType<TYPES>) -> Result<(), BlockStorageError>;
+    async fn retrieve(&self, view: TYPES::Time) -> ProposalType<TYPES>;
     fn empty() -> Self;
 }
