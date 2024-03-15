@@ -118,4 +118,5 @@ jobs:
           cd HotShot
           echo '[patch."https://github.com/EspressoSystems/hotshot-types"]' >> Cargo.toml
           echo 'hotshot-types = { git = "https://github.com/EspressoSystems//hotshot-types", rev = "${{ github.event.pull_request.head.sha }}" }' >> Cargo.toml
+          cargo update hotshot-types
           just ${{ matrix.just_variants }} build
