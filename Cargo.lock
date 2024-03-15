@@ -1655,7 +1655,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
- "snafu",
+ "snafu 0.8.2",
  "tagged-base64",
  "time",
  "tokio",
@@ -2824,7 +2824,16 @@ checksum = "e4de37ad025c587a29e8f3f5605c00f70b98715ef90b9061a815b9e59e9042d6"
 dependencies = [
  "backtrace",
  "doc-comment",
- "snafu-derive",
+ "snafu-derive 0.7.5",
+]
+
+[[package]]
+name = "snafu"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75976f4748ab44f6e5332102be424e7c2dc18daeaf7e725f2040c3ebb133512e"
+dependencies = [
+ "snafu-derive 0.8.2",
 ]
 
 [[package]]
@@ -2837,6 +2846,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "snafu-derive"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4b19911debfb8c2fb1107bc6cb2d61868aaf53a988449213959bb1b5b1ed95f"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.52",
 ]
 
 [[package]]
@@ -2930,7 +2951,7 @@ dependencies = [
  "base64",
  "crc-any",
  "serde",
- "snafu",
+ "snafu 0.7.5",
  "tagged-base64-macros",
  "wasm-bindgen",
 ]
