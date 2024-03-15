@@ -16,7 +16,6 @@ use crate::{
         node_implementation::{ConsensusTime, NodeType},
         signature_key::SignatureKey,
         states::TestableState,
-        storage::StoredView,
         BlockPayload,
     },
     utils::bincode_opts,
@@ -398,18 +397,6 @@ impl<TYPES: NodeType> Leaf<TYPES> {
     pub fn get_proposer_id(&self) -> TYPES::SignatureKey {
         self.proposer_id.clone()
     }
-
-    /// Create a leaf from information stored about a view.
-    pub fn from_stored_view(stored_view: StoredView<TYPES>) -> Self {
-        Self {
-            view_number: stored_view.view_number,
-            justify_qc: stored_view.justify_qc,
-            parent_commitment: stored_view.parent,
-            block_header: stored_view.block_header,
-            block_payload: stored_view.block_payload,
-            proposer_id: stored_view.proposer_id,
-        }
-    }
 }
 
 impl<TYPES: NodeType> TestableLeaf for Leaf<TYPES>
@@ -492,21 +479,5 @@ impl<TYPES: NodeType> Committable for Leaf<TYPES> {
             .constant_str("justify_qc signatures")
             .var_size_bytes(&signatures_bytes)
             .finalize()
-    }
-}
-
-impl<TYPES> From<Leaf<TYPES>> for StoredView<TYPES>
-where
-    TYPES: NodeType,
-{
-    fn from(leaf: Leaf<TYPES>) -> Self {
-        StoredView {
-            view_number: leaf.get_view_number(),
-            parent: leaf.get_parent_commitment(),
-            justify_qc: leaf.get_justify_qc(),
-            block_header: leaf.get_block_header().clone(),
-            block_payload: leaf.get_block_payload(),
-            proposer_id: leaf.get_proposer_id(),
-        }
     }
 }
