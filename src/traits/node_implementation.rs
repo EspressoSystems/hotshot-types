@@ -48,6 +48,7 @@ pub trait NodeImplementation<TYPES: NodeType>:
 
     /// Network for all nodes
     type QuorumNetwork: ConnectedNetwork<Message<TYPES>, TYPES::SignatureKey>;
+
     /// Network for those in the DA committee
     type CommitteeNetwork: ConnectedNetwork<Message<TYPES>, TYPES::SignatureKey>;
 
