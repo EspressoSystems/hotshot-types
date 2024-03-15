@@ -112,5 +112,5 @@ jobs:
         run: |
           git clone https://github.com/EspressoSystems/HotShot
           cd HotShot
-          echo '\n[patch."https://github.com/EspressoSystems/hotshot-types"]\nhotshot-types = { git = "https://github.com/EspressoSystems//hotshot-types", rev = "${{ github.sha }}" }' >> Cargo.toml
+          echo '\n[patch."https://github.com/EspressoSystems/hotshot-types"]\nhotshot-types = { git = "https://github.com/EspressoSystems//hotshot-types", rev = "${{ github.event.pull_request.head.sha }}" }' >> Cargo.toml
           just ${{ matrix.just_variants }} build
