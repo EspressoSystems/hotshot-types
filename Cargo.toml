@@ -4,12 +4,11 @@ description = "Types and traits for the HotShot consesus module"
 edition = "2021"
 name = "hotshot-types"
 readme = "../README.md"
-version = "0.1.5"
+version = "0.1.7"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ark-bls12-381 = "0.4"
 ark-bn254 = "0.4"
 ark-ec = "0.4"
 ark-ed-on-bn254 = "0.4"
@@ -40,11 +39,11 @@ futures = "0.3.30"
 # https://github.com/EspressoSystems/HotShot/issues/1850
 generic-array = { version = "0.14.7", features = ["serde"] }
 
-jf-primitives = { git = "https://github.com/EspressoSystems/jellyfish", tag = "0.4.1", features = [
+jf-primitives = { git = "https://github.com/EspressoSystems/jellyfish", tag = "0.4.2", features = [
         "test-srs",
 ] }
-jf-plonk = { git = "https://github.com/EspressoSystems/jellyfish", tag = "0.4.1" }
-jf-utils = { git = "https://github.com/espressosystems/jellyfish", tag = "0.4.1" }
+jf-plonk = { git = "https://github.com/EspressoSystems/jellyfish", tag = "0.4.2" }
+jf-utils = { git = "https://github.com/espressosystems/jellyfish", tag = "0.4.2" }
 lazy_static = "1.4.0"
 rand = "0.8.5"
 rand_chacha = { version = "0.3.1", default-features = false }
@@ -62,6 +61,11 @@ dyn-clone = { git = "https://github.com/dtolnay/dyn-clone", tag = "1.0.17" }
 
 [dev-dependencies]
 serde_json = { version = "1.0.114" }
+
+[features]
+gpu-vid = [
+    "jf-primitives/gpu-vid",
+]
 
 [target.'cfg(all(async_executor_impl = "async-std"))'.dependencies]
 async-std = { version = "1.12.0", features = ["attributes"] }
