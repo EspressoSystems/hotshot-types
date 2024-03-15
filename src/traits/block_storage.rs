@@ -23,19 +23,14 @@ pub enum BlockStorageError {
     RetrieveError,
 }
 
-pub enum ProposalType<TYPES>
-where
-    TYPES: NodeType + 'static,
-{
+#[derive(Clone, Debug)]
+pub enum ProposalType<TYPES: NodeType> {
     DAProposal(Proposal<TYPES, DAProposal<TYPES>>),
     VidDisperse(Proposal<TYPES, VidDisperse<TYPES>>),
 }
 
 /// Abstraction for storing the contents of DA proposals and VID shares.
 #[async_trait]
-pub trait BlockStorage<TYPES>: Clone + Send + Sync + Sized + 'static
-where
-    TYPES: NodeType + 'static,
-{
+pub trait BlockStorage<TYPES: NodeType> {
     async fn append(&self, proposal: &ProposalType<TYPES>) -> Result<(), BlockStorageError>;
 }
