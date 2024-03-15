@@ -89,7 +89,6 @@ jobs:
           - tokio
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
-    container: ghcr.io/espressosystems/devops-rust:stable
     steps:
       - name: Install Rust (stable)
         uses: dtolnay/rust-toolchain@stable
