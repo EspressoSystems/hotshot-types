@@ -218,9 +218,8 @@ pub enum SequencingMessage<TYPES: NodeType> {
 #[serde(bound(deserialize = "", serialize = ""))]
 /// Arbitrary message data. Mostly intended to be used in testing.
 pub struct ArbitraryData<TYPES: NodeType> {
-  /// View number this message originated in.
-  pub view_number: TYPES::Time,
-
+    /// View number this message originated in.
+    pub view_number: TYPES::Time,
 }
 
 impl<TYPES: NodeType> SequencingMessage<TYPES> {
@@ -277,7 +276,7 @@ impl<TYPES: NodeType> SequencingMessage<TYPES> {
                 }
             }
             #[cfg(feature = "arbitrary-messages")]
-            SequencingMessage::Arbitrary(data) => data.view_number
+            SequencingMessage::Arbitrary(data) => data.view_number,
         }
     }
 
