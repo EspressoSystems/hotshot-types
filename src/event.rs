@@ -11,7 +11,6 @@ use crate::{
 };
 
 use std::sync::Arc;
-
 /// A status event emitted by a `HotShot` instance
 ///
 /// This includes some metadata, such as the stage and view number that the event was generated in,

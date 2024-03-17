@@ -4,7 +4,7 @@ pub use crate::utils::{View, ViewInner};
 use displaydoc::Display;
 
 use crate::{
-    data::Leaf,
+    data::{Leaf, VidDisperseShare},
     error::HotShotError,
     message::Proposal,
     simple_certificate::{DACertificate, QuorumCertificate, UpgradeCertificate},
@@ -22,7 +22,6 @@ use std::{
     sync::{Arc, Mutex},
 };
 use tracing::error;
-use crate::data::VidDisperseShare;
 
 /// A type alias for `HashMap<Commitment<T>, T>`
 type CommitmentMap<T> = HashMap<Commitment<T>, T>;
