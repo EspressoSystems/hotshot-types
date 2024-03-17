@@ -169,6 +169,8 @@ pub struct HotShotConfig<KEY: SignatureKey, ELECTIONCONFIG: ElectionConfig> {
     pub da_non_staked_committee_size: usize,
     /// Base duration for next-view timeout, in milliseconds
     pub next_view_timeout: u64,
+    /// Duration of view sync round timeouts
+    pub view_sync_timeout: Duration,
     /// The exponential backoff ration for the next-view timeout
     pub timeout_ratio: (u64, u64),
     /// The delay a leader inserts before starting pre-commit, in milliseconds

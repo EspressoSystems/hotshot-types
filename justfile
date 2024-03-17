@@ -39,6 +39,10 @@ test *ARGS:
   echo Testing {{ARGS}}
   cargo test --verbose --lib --bins --tests --benches --workspace --no-fail-fast {{ARGS}} -- --test-threads=1 --nocapture --skip crypto_test
 
+test-ci *ARGS:
+  echo Testing {{ARGS}}
+  RUST_LOG=debug cargo test --verbose --lib --bins --tests --benches --workspace --no-fail-fast {{ARGS}} -- --test-threads=1
+
 check:
   echo Checking
   cargo check --workspace --bins --tests --examples
