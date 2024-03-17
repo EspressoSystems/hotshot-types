@@ -41,7 +41,10 @@ pub struct Consensus<TYPES: NodeType> {
     /// In the future we will need a different struct similar to VidDisperse except
     /// it stores only one share.
     /// TODO <https://github.com/EspressoSystems/HotShot/issues/1732>
-    pub vid_shares: BTreeMap<TYPES::Time, HashMap<TYPES::SignatureKey, Proposal<TYPES, VidDisperseShare<TYPES>>>>,
+    pub vid_shares: BTreeMap<
+        TYPES::Time,
+        HashMap<TYPES::SignatureKey, Proposal<TYPES, VidDisperseShare<TYPES>>>,
+    >,
 
     /// All the DA certs we've received for current and future views.
     /// view -> DA cert

@@ -4,6 +4,7 @@
 //! `HotShot`'s version of a block, and proposals, messages upon which to reach the consensus.
 
 use crate::{
+    message::Proposal,
     simple_certificate::{
         QuorumCertificate, TimeoutCertificate, UpgradeCertificate, ViewSyncFinalizeCertificate2,
     },
@@ -35,11 +36,10 @@ use std::{
     collections::BTreeMap,
     fmt::{Debug, Display},
     hash::Hash,
+    marker::PhantomData,
     sync::Arc,
 };
-use std::marker::PhantomData;
 use tracing::error;
-use crate::message::Proposal;
 
 /// Type-safe wrapper around `u64` so we know the thing we're talking about is a view number.
 #[derive(
@@ -190,18 +190,18 @@ pub struct VidDisperseShare<TYPES: NodeType> {
 
 impl<TYPES: NodeType> VidDisperseShare<TYPES> {
     /// Create a vector of `VidDisperseShare` from `VidDisperse`
-    pub fn from_vid_disperse(
-        vid_disperse: VidDisperse<TYPES>,
-    ) -> Vec<Self> {
-        vid_disperse.shares.into_iter().map(|(recipient_key, share)| {
-            VidDisperseShare {
+    pub fn from_vid_disperse(vid_disperse: VidDisperse<TYPES>) -> Vec<Self> {
+        vid_disperse
+            .shares
+            .into_iter()
+            .map(|(recipient_key, share)| VidDisperseShare {
                 share,
                 recipient_key,
                 view_number: vid_disperse.view_number,
                 common: vid_disperse.common.clone(),
                 payload_commitment: vid_disperse.payload_commitment,
-            }
-        }).collect()
+            })
+            .collect()
     }
 
     /// Consume `self` and return a `Proposal`
@@ -209,40 +209,42 @@ impl<TYPES: NodeType> VidDisperseShare<TYPES> {
         self,
         private_key: &<TYPES::SignatureKey as SignatureKey>::PrivateKey,
     ) -> Option<Proposal<TYPES, Self>> {
-        let Ok(signature) = TYPES::SignatureKey::sign(
-            private_key,
-            self.payload_commitment.as_ref().as_ref(),
-        ) else {
+        let Ok(signature) =
+            TYPES::SignatureKey::sign(private_key, self.payload_commitment.as_ref().as_ref())
+        else {
             error!("VID: failed to sign dispersal share payload");
             return None;
         };
         Some(Proposal {
             signature,
             _pd: PhantomData,
-            data: self
+            data: self,
         })
     }
 
     /// Create `VidDisperse` out of an iterator to `VidDisperseShare`s
     pub fn to_vid_disperse<'a, I>(mut it: I) -> Option<VidDisperse<TYPES>>
     where
-        I: Iterator<Item=&'a VidDisperseShare<TYPES>>
+        I: Iterator<Item = &'a VidDisperseShare<TYPES>>,
     {
         let first_vid_disperse_share = it.next()?.clone();
         let mut share_map = BTreeMap::new();
         share_map.insert(
             first_vid_disperse_share.recipient_key,
-            first_vid_disperse_share.share);
+            first_vid_disperse_share.share,
+        );
         let mut vid_disperse = VidDisperse {
             view_number: first_vid_disperse_share.view_number,
             payload_commitment: first_vid_disperse_share.payload_commitment,
             common: first_vid_disperse_share.common,
             shares: share_map,
         };
-        let _ = it.map(|vid_disperse_share| vid_disperse
-            .shares
-            .insert(vid_disperse_share.recipient_key.clone(), vid_disperse_share.share.clone())
-        );
+        let _ = it.map(|vid_disperse_share| {
+            vid_disperse.shares.insert(
+                vid_disperse_share.recipient_key.clone(),
+                vid_disperse_share.share.clone(),
+            )
+        });
         Some(vid_disperse)
     }
 }
