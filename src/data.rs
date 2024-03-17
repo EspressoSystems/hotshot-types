@@ -239,7 +239,7 @@ impl<TYPES: NodeType> VidDisperseShare<TYPES> {
             common: first_vid_disperse_share.common,
             shares: share_map,
         };
-        it.map(|vid_disperse_share| vid_disperse
+        let _ = it.map(|vid_disperse_share| vid_disperse
             .shares
             .insert(vid_disperse_share.recipient_key.clone(), vid_disperse_share.share.clone())
         );

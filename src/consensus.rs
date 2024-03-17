@@ -4,7 +4,7 @@ pub use crate::utils::{View, ViewInner};
 use displaydoc::Display;
 
 use crate::{
-    data::{Leaf, VidDisperse},
+    data::Leaf,
     error::HotShotError,
     message::Proposal,
     simple_certificate::{DACertificate, QuorumCertificate, UpgradeCertificate},

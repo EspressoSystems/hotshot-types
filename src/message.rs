@@ -17,7 +17,7 @@ use crate::traits::network::ResponseMessage;
 use crate::traits::signature_key::SignatureKey;
 use crate::vote::HasViewNumber;
 use crate::{
-    data::{DAProposal, VidDisperse},
+    data::DAProposal,
     simple_vote::QuorumVote,
     traits::{
         network::{DataRequest, NetworkMsg, ViewMessage},

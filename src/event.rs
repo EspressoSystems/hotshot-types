@@ -11,7 +11,6 @@ use crate::{
 };
 
 use std::sync::Arc;
-use crate::data::VidDisperseShare;
 
 /// A status event emitted by a `HotShot` instance
 ///
