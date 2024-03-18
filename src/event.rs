@@ -158,7 +158,9 @@ pub enum EventType<TYPES: NodeType> {
         sender: TYPES::SignatureKey,
     },
     AttributableAction {
+        /// View the action took place
         view: TYPES::Time,
+        /// Type of action that was taken
         action: HotShotAction,
     },
 }
