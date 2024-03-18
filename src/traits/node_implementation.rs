@@ -5,10 +5,10 @@
 
 use super::{
     block_contents::{BlockHeader, TestableBlock, Transaction},
-    block_storage::BlockStorage,
     election::ElectionConfig,
     network::{ConnectedNetwork, NetworkReliability, TestableNetworkingImplementation},
     states::TestableState,
+    storage::Storage,
     ValidatedState,
 };
 use crate::{
@@ -48,7 +48,7 @@ pub trait NodeImplementation<TYPES: NodeType>:
     type CommitteeNetwork: ConnectedNetwork<Message<TYPES>, TYPES::SignatureKey>;
 
     /// Storage for DA layer interactions
-    type BlockStorage: BlockStorage<TYPES>;
+    type Storage: Storage<TYPES>;
 }
 
 /// extra functions required on a node implementation to be usable by hotshot-testing
