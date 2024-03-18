@@ -294,6 +294,8 @@ impl<TYPES: NodeType> SequencingMessage<TYPES> {
 
 #[derive(Serialize, Deserialize, Derivative, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(bound(deserialize = ""))]
+#[allow(clippy::large_enum_variant)]
+/// TODO: Put `DataResponse` content in a `Box` to make enum smaller
 /// Messages related to sending data between nodes
 pub enum DataMessage<TYPES: NodeType> {
     /// Contains a transaction to be submitted

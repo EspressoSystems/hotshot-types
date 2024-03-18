@@ -265,6 +265,8 @@ pub enum RequestKind<TYPES: NodeType> {
 /// The kind of message `M` is is determined by what we requested
 #[derive(Serialize, Deserialize, Derivative, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(bound(deserialize = ""))]
+#[allow(clippy::large_enum_variant)]
+/// TODO: Put `Found` content in a `Box` to make enum smaller
 pub enum ResponseMessage<TYPES: NodeType> {
     /// Peer returned us some data
     Found(SequencingMessage<TYPES>),
