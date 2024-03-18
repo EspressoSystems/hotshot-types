@@ -8,15 +8,14 @@ use super::{
     election::ElectionConfig,
     network::{ConnectedNetwork, NetworkReliability, TestableNetworkingImplementation},
     states::TestableState,
-    storage::{StorageError, StorageState, TestableStorage},
+    storage::Storage,
     ValidatedState,
 };
 use crate::{
     data::{Leaf, TestableLeaf},
     message::Message,
     traits::{
-        election::Membership, signature_key::SignatureKey, states::InstanceState, storage::Storage,
-        BlockPayload,
+        election::Membership, signature_key::SignatureKey, states::InstanceState, BlockPayload,
     },
 };
 use async_trait::async_trait;
@@ -42,13 +41,14 @@ use std::{
 pub trait NodeImplementation<TYPES: NodeType>:
     Send + Sync + Clone + Eq + Hash + 'static + Serialize + for<'de> Deserialize<'de>
 {
-    /// Storage type for this consensus implementation
-    type Storage: Storage<TYPES> + Clone;
-
     /// Network for all nodes
     type QuorumNetwork: ConnectedNetwork<Message<TYPES>, TYPES::SignatureKey>;
+
     /// Network for those in the DA committee
     type CommitteeNetwork: ConnectedNetwork<Message<TYPES>, TYPES::SignatureKey>;
+
+    /// Storage for DA layer interactions
+    type Storage: Storage<TYPES>;
 }
 
 /// extra functions required on a node implementation to be usable by hotshot-testing
@@ -86,15 +86,6 @@ pub trait TestableNodeImplementation<TYPES: NodeType>: NodeImplementation<TYPES>
     /// the number of transactions in a block
     fn txn_count(block: &TYPES::BlockPayload) -> u64;
 
-    /// Create ephemeral storage
-    /// Will be deleted/lost immediately after storage is dropped
-    /// # Errors
-    /// Errors if it is not possible to construct temporary storage.
-    fn construct_tmp_storage() -> Result<Self::Storage, StorageError>;
-
-    /// Return the full internal state. This is useful for debugging.
-    async fn get_full_state(storage: &Self::Storage) -> StorageState<TYPES>;
-
     /// Generate the communication channels for testing
     fn gen_networks(
         expected_node_count: usize,
@@ -110,7 +101,6 @@ impl<TYPES: NodeType, I: NodeImplementation<TYPES>> TestableNodeImplementation<T
 where
     TYPES::ValidatedState: TestableState<TYPES>,
     TYPES::BlockPayload: TestableBlock,
-    I::Storage: TestableStorage<TYPES>,
     I::QuorumNetwork: TestableNetworkingImplementation<TYPES>,
     I::CommitteeNetwork: TestableNetworkingImplementation<TYPES>,
 {
@@ -152,13 +142,6 @@ where
         <TYPES::BlockPayload as TestableBlock>::txn_count(block)
     }
 
-    fn construct_tmp_storage() -> Result<Self::Storage, StorageError> {
-        <I::Storage as TestableStorage<TYPES>>::construct_tmp_storage()
-    }
-
-    async fn get_full_state(storage: &Self::Storage) -> StorageState<TYPES> {
-        <I::Storage as TestableStorage<TYPES>>::get_full_state(storage).await
-    }
     fn gen_networks(
         expected_node_count: usize,
         num_bootstrap: usize,
