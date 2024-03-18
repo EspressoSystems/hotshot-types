@@ -60,7 +60,6 @@ versioned-binary-serialization = { git = "https://github.com/EspressoSystems/ver
 derivative = "2.2.0"
 displaydoc = { version = "0.2.3", default-features = false }
 dyn-clone = { git = "https://github.com/dtolnay/dyn-clone", tag = "1.0.17" }
-# hotshot-utils = { path = "../utils" }
 
 [dev-dependencies]
 serde_json = { version = "1.0.114" }
