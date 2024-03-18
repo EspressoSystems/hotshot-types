@@ -4,9 +4,7 @@
 //! occur while interacting with this crate.
 
 //use crate::traits::network::TimeoutErr;
-use crate::traits::{
-    block_contents::BlockPayload, node_implementation::NodeType, storage::StorageError,
-};
+use crate::traits::{block_contents::BlockPayload, node_implementation::NodeType};
 #[cfg(async_executor_impl = "async-std")]
 use async_std::future::TimeoutError;
 use serde::{Deserialize, Serialize};
@@ -49,10 +47,6 @@ pub enum HotShotError<TYPES: NodeType> {
     /// Item was not present in storage
     LeafNotFound {/* TODO we should create a way to to_string */},
     /// Error accesing storage
-    StorageError {
-        /// Underlying error
-        source: StorageError,
-    },
     /// Invalid state machine state
     #[snafu(display("Invalid state machine state: {}", context))]
     InvalidState {
