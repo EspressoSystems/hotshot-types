@@ -8,7 +8,7 @@
 //! This crate and all downstream crates should talk to the VID scheme only
 //! via the traits exposed here.
 
-use ark_bls12_381::Bls12_381;
+use ark_bn254::Bn254;
 use jf_primitives::{
     pcs::{
         checked_fft_size,
@@ -17,8 +17,8 @@ use jf_primitives::{
     },
     vid::{
         advz::{
+            self,
             payload_prover::{LargeRangeProof, SmallRangeProof},
-            Advz,
         },
         payload_prover::{PayloadProver, Statement},
         precomputable::Precomputable,
@@ -70,9 +70,16 @@ pub type VidCommon = <VidSchemeType as VidScheme>::Common;
 /// VID share type
 pub type VidShare = <VidSchemeType as VidScheme>::Share;
 
+#[cfg(not(feature = "gpu-vid"))]
+/// Internal Jellyfish VID scheme
+type Advz = advz::Advz<E, H>;
+#[cfg(feature = "gpu-vid")]
+/// Internal Jellyfish VID scheme
+type Advz = advz::AdvzGPU<'static, E, H>;
+
 /// Newtype wrapper for a VID scheme type that impls
 /// [`VidScheme`], [`PayloadProver`], [`Precomputable`].
-pub struct VidSchemeType(Advz<E, H>);
+pub struct VidSchemeType(Advz);
 
 /// Newtype wrapper for a large payload range proof.
 ///
@@ -121,7 +128,7 @@ lazy_static! {
 }
 
 /// Private type alias for the EC pairing type parameter for [`Advz`].
-type E = Bls12_381;
+type E = Bn254;
 /// Private type alias for the hash type parameter for [`Advz`].
 type H = Sha256;
 
@@ -131,18 +138,18 @@ type H = Sha256;
 // type alias impl trait (TAIT):
 // [rfcs/text/2515-type_alias_impl_trait.md at master · rust-lang/rfcs](https://github.com/rust-lang/rfcs/blob/master/text/2515-type_alias_impl_trait.md)
 impl VidScheme for VidSchemeType {
-    type Commit = <Advz<E, H> as VidScheme>::Commit;
-    type Share = <Advz<E, H> as VidScheme>::Share;
-    type Common = <Advz<E, H> as VidScheme>::Common;
+    type Commit = <Advz as VidScheme>::Commit;
+    type Share = <Advz as VidScheme>::Share;
+    type Common = <Advz as VidScheme>::Common;
 
-    fn commit_only<B>(&self, payload: B) -> VidResult<Self::Commit>
+    fn commit_only<B>(&mut self, payload: B) -> VidResult<Self::Commit>
     where
         B: AsRef<[u8]>,
     {
         self.0.commit_only(payload)
     }
 
-    fn disperse<B>(&self, payload: B) -> VidResult<VidDisperse<Self>>
+    fn disperse<B>(&mut self, payload: B) -> VidResult<VidDisperse<Self>>
     where
         B: AsRef<[u8]>,
     {
@@ -163,19 +170,19 @@ impl VidScheme for VidSchemeType {
     }
 
     fn is_consistent(commit: &Self::Commit, common: &Self::Common) -> VidResult<()> {
-        <Advz<E, H> as VidScheme>::is_consistent(commit, common)
+        <Advz as VidScheme>::is_consistent(commit, common)
     }
 
     fn get_payload_byte_len(common: &Self::Common) -> usize {
-        <Advz<E, H> as VidScheme>::get_payload_byte_len(common)
+        <Advz as VidScheme>::get_payload_byte_len(common)
     }
 
     fn get_num_storage_nodes(common: &Self::Common) -> usize {
-        <Advz<E, H> as VidScheme>::get_num_storage_nodes(common)
+        <Advz as VidScheme>::get_num_storage_nodes(common)
     }
 
     fn get_multiplicity(common: &Self::Common) -> usize {
-        <Advz<E, H> as VidScheme>::get_multiplicity(common)
+        <Advz as VidScheme>::get_multiplicity(common)
     }
 }
 
@@ -218,7 +225,7 @@ impl PayloadProver<SmallRangeProofType> for VidSchemeType {
 }
 
 impl Precomputable for VidSchemeType {
-    type PrecomputeData = <Advz<E, H> as Precomputable>::PrecomputeData;
+    type PrecomputeData = <Advz as Precomputable>::PrecomputeData;
 
     fn commit_only_precompute<B>(
         &self,
@@ -244,14 +251,14 @@ impl Precomputable for VidSchemeType {
     }
 }
 
-/// Convert a [`VidDisperse<Advz<E, H>>`] to a [`VidDisperse<VidSchemeType>`].
+/// Convert a [`VidDisperse<Advz>`] to a [`VidDisperse<VidSchemeType>`].
 ///
 /// Foreign type rules prevent us from doing:
-/// - `impl From<VidDisperse<VidSchemeType>> for VidDisperse<Advz<E, H>>`
+/// - `impl From<VidDisperse<VidSchemeType>> for VidDisperse<Advz>`
 /// - `impl VidDisperse<VidSchemeType> {...}`
 /// and similarly for `Statement`.
 /// Thus, we accomplish type conversion via functions.
-fn vid_disperse_conversion(vid_disperse: VidDisperse<Advz<E, H>>) -> VidDisperse<VidSchemeType> {
+fn vid_disperse_conversion(vid_disperse: VidDisperse<Advz>) -> VidDisperse<VidSchemeType> {
     VidDisperse {
         shares: vid_disperse.shares,
         common: vid_disperse.common,
@@ -259,8 +266,8 @@ fn vid_disperse_conversion(vid_disperse: VidDisperse<Advz<E, H>>) -> VidDisperse
     }
 }
 
-/// Convert a [`Statement<'_, VidSchemeType>`] to a [`Statement<'_, Advz<E, H>>`].
-fn stmt_conversion(stmt: Statement<'_, VidSchemeType>) -> Statement<'_, Advz<E, H>> {
+/// Convert a [`Statement<'_, VidSchemeType>`] to a [`Statement<'_, Advz>`].
+fn stmt_conversion(stmt: Statement<'_, VidSchemeType>) -> Statement<'_, Advz> {
     Statement {
         payload_subslice: stmt.payload_subslice,
         range: stmt.range,

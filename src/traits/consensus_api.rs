@@ -1,12 +1,10 @@
 //! Contains the [`ConsensusApi`] trait.
 
 use crate::{
-    data::Leaf,
     event::Event,
     traits::{
         node_implementation::{NodeImplementation, NodeType},
         signature_key::SignatureKey,
-        storage::StorageError,
     },
 };
 use async_trait::async_trait;
@@ -41,11 +39,4 @@ pub trait ConsensusApi<TYPES: NodeType, I: NodeImplementation<TYPES>>: Send + Sy
 
     /// Notify the system of an event within `hotshot-consensus`.
     async fn send_event(&self, event: Event<TYPES>);
-
-    /// Store a leaf in the storage
-    async fn store_leaf(
-        &self,
-        old_anchor_view: TYPES::Time,
-        leaf: Leaf<TYPES>,
-    ) -> Result<(), StorageError>;
 }
