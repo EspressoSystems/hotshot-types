@@ -157,4 +157,16 @@ pub enum EventType<TYPES: NodeType> {
         /// Public key of the leader submitting the proposal
         sender: TYPES::SignatureKey,
     },
+    AttributableAction {
+        view: TYPES::Time,
+        action: HotShotAction,
+    },
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum HotShotAction {
+    Vote,
+    Propose,
+    DAPropose,
+    DAVote,
 }

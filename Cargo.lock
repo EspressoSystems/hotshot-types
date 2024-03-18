@@ -1658,7 +1658,7 @@ dependencies = [
 
 [[package]]
 name = "hotshot-types"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "ark-bn254",
  "ark-ec",
