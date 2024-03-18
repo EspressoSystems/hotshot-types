@@ -1,12 +1,11 @@
 //! Events that a `HotShot` instance can emit
 
-use either::Either::Left;
 use serde::{Deserialize, Serialize};
 
 use crate::{
     data::{DAProposal, Leaf, QuorumProposal, UpgradeProposal, VidDisperse},
     error::HotShotError,
-    message::{MessageKind, Proposal, SequencingMessage},
+    message::Proposal,
     simple_certificate::QuorumCertificate,
     traits::{node_implementation::NodeType, ValidatedState},
 };
