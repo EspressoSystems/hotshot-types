@@ -3,7 +3,6 @@
 //! This module contains types used to represent the various types of messages that
 //! `HotShot` nodes can send among themselves.
 
-use crate::constants::Version;
 use crate::data::{QuorumProposal, UpgradeProposal};
 use crate::simple_certificate::{
     DACertificate, ViewSyncCommitCertificate2, ViewSyncFinalizeCertificate2,
@@ -24,7 +23,6 @@ use crate::{
         node_implementation::{ConsensusTime, NodeType},
     },
 };
-
 use derivative::Derivative;
 use either::Either::{self, Left, Right};
 use serde::de::DeserializeOwned;
@@ -35,9 +33,6 @@ use std::{fmt::Debug, marker::PhantomData};
 #[derive(Serialize, Deserialize, Clone, Debug, Derivative, PartialEq, Eq, Hash)]
 #[serde(bound(deserialize = "", serialize = ""))]
 pub struct Message<TYPES: NodeType> {
-    /// The version of the protocol in use for this message
-    pub version: Version,
-
     /// The sender of this message
     pub sender: TYPES::SignatureKey,
 

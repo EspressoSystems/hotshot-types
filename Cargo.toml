@@ -4,11 +4,13 @@ description = "Types and traits for the HotShot consesus module"
 edition = "2021"
 name = "hotshot-types"
 readme = "../README.md"
-version = "0.1.10"
+version = "0.1.11"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0"
+ark-bls12-381 = "0.4"
 ark-bn254 = "0.4"
 ark-ec = "0.4"
 ark-ed-on-bn254 = "0.4"
@@ -54,19 +56,16 @@ tagged-base64 = { git = "https://github.com/EspressoSystems/tagged-base64", tag 
 time = "0.3.34"
 tracing = "0.1.40"
 typenum = "1.17.0"
+versioned-binary-serialization = { git = "https://github.com/EspressoSystems/versioned-binary-serialization.git", tag = "0.1.2" }
 derivative = "2.2.0"
 displaydoc = { version = "0.2.3", default-features = false }
 dyn-clone = { git = "https://github.com/dtolnay/dyn-clone", tag = "1.0.17" }
-anyhow = "1.0.81"
-# hotshot-utils = { path = "../utils" }
 
 [dev-dependencies]
 serde_json = { version = "1.0.114" }
 
 [features]
-gpu-vid = [
-    "jf-primitives/gpu-vid",
-]
+gpu-vid = ["jf-primitives/gpu-vid"]
 
 [target.'cfg(all(async_executor_impl = "async-std"))'.dependencies]
 async-std = { version = "1.12.0", features = ["attributes"] }
