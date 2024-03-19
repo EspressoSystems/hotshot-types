@@ -39,7 +39,7 @@ futures = "0.3.30"
 
 # TODO generic-array should not be a direct dependency
 # https://github.com/EspressoSystems/HotShot/issues/1850
-generic-array = { version = "0.14.7", features = ["serde"] }
+generic-array = { version = "1.0.0", features = ["serde"] }
 
 jf-primitives = { git = "https://github.com/EspressoSystems/jellyfish", tag = "0.4.2", features = [
         "test-srs",
