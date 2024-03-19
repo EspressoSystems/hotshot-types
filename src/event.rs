@@ -167,4 +167,6 @@ pub enum HotShotAction {
     DAVote,
     DACert,
     VidDisperse,
+    UpgradeVote,
+    UpgradePropose,
 }
