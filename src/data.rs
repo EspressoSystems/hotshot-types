@@ -246,6 +246,27 @@ impl<TYPES: NodeType> VidDisperseShare<TYPES> {
         });
         Some(vid_disperse)
     }
+
+    pub fn to_vid_share_proposals(
+        vid_disperse_proposal: Proposal<TYPES, VidDisperse<TYPES>>,
+    ) -> Vec<Proposal<TYPES, VidDisperseShare<TYPES>>> {
+        vid_disperse_proposal
+            .data
+            .shares
+            .into_iter()
+            .map(|(recipient_key, share)| Proposal {
+                data: VidDisperseShare {
+                    share,
+                    recipient_key,
+                    view_number: vid_disperse_proposal.data.view_number,
+                    common: vid_disperse_proposal.data.common.clone(),
+                    payload_commitment: vid_disperse_proposal.data.payload_commitment,
+                },
+                signature: vid_disperse_proposal.signature.clone(),
+                _pd: vid_disperse_proposal._pd,
+            })
+            .collect()
+    }
 }
 
 /// Proposal to append a block.
