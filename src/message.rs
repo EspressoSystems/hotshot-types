@@ -24,7 +24,6 @@ use crate::{
         node_implementation::{ConsensusTime, NodeType},
     },
 };
-
 use derivative::Derivative;
 use either::Either::{self, Left, Right};
 use serde::de::DeserializeOwned;
@@ -35,9 +34,6 @@ use std::{fmt::Debug, marker::PhantomData};
 #[derive(Serialize, Deserialize, Clone, Debug, Derivative, PartialEq, Eq, Hash)]
 #[serde(bound(deserialize = "", serialize = ""))]
 pub struct Message<TYPES: NodeType> {
-    /// The version of the protocol in use for this message
-    pub version: Version,
-
     /// The sender of this message
     pub sender: TYPES::SignatureKey,
 

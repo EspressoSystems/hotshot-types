@@ -189,6 +189,8 @@ mod tests {
         bls_over_bn254::{BLSOverBN254CurveSignatureScheme, KeyPair},
         SignatureScheme,
     };
+    use versioned_binary_serialization::{version::StaticVersion, BinarySerializer, Serializer};
+    type Version = StaticVersion<0, 1>;
 
     macro_rules! test_quorum_certificate {
         ($aggsig:tt) => {
@@ -242,12 +244,16 @@ mod tests {
             // Check the QC and the QCParams can be serialized / deserialized
             assert_eq!(
                 qc,
-                bincode::deserialize(&bincode::serialize(&qc).unwrap()).unwrap()
+                Serializer::<Version>::deserialize(&Serializer::<Version>::serialize(&qc).unwrap())
+                    .unwrap()
             );
 
             assert_eq!(
                 qc_pp,
-                bincode::deserialize(&bincode::serialize(&qc_pp).unwrap()).unwrap()
+                Serializer::<Version>::deserialize(
+                    &Serializer::<Version>::serialize(&qc_pp).unwrap()
+                )
+                .unwrap()
             );
 
             // bad paths

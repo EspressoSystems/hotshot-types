@@ -7,12 +7,12 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    constants::Version,
     data::Leaf,
     traits::{node_implementation::NodeType, signature_key::SignatureKey},
     vid::VidCommitment,
     vote::{HasViewNumber, Vote},
 };
+use versioned_binary_serialization::version::Version;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Hash, Eq)]
 /// Data used for a yes vote.
