@@ -4,7 +4,7 @@ description = "Types and traits for the HotShot consesus module"
 edition = "2021"
 name = "hotshot-types"
 readme = "../README.md"
-version = "0.1.7"
+version = "0.1.10"
 
 [features]
 arbitrary-messages = []
@@ -64,6 +64,7 @@ typenum = "1.17.0"
 derivative = "2.2.0"
 displaydoc = { version = "0.2.3", default-features = false }
 dyn-clone = { git = "https://github.com/dtolnay/dyn-clone", tag = "1.0.17" }
+anyhow = "1.0.81"
 # hotshot-utils = { path = "../utils" }
 
 [dev-dependencies]
