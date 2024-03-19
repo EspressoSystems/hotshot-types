@@ -334,10 +334,14 @@ pub trait ConnectedNetwork<M: NetworkMsg, K: SignatureKey + 'static>:
 
     /// send messages with vid shares to its recipients
     /// blocking
-    async fn vid_broadcast_message(&self, messages: HashMap<K, M>) -> Result<(), NetworkError> {
-        let future_results = messages
-            .into_iter()
-            .map(|(recipient_key, message)| self.direct_message(message, recipient_key));
+    async fn vid_broadcast_message<VER: StaticVersionType + 'static>(
+        &self,
+        messages: HashMap<K, M>,
+        bind_version: VER,
+    ) -> Result<(), NetworkError> {
+        let future_results = messages.into_iter().map(|(recipient_key, message)| {
+            self.direct_message(message, recipient_key, bind_version)
+        });
         let results = join_all(future_results).await;
 
         let errors: Vec<_> = results
