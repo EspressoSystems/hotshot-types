@@ -302,8 +302,8 @@ impl<TYPES: NodeType> SequencingMessage<TYPES> {
                     MessagePurpose::ViewSyncCertificate
                 }
 
-                GeneralConsensusMessage::UpgradeProposal(_)
-                | GeneralConsensusMessage::UpgradeVote(_) => MessagePurpose::Upgrade,
+                GeneralConsensusMessage::UpgradeProposal(_) => MessagePurpose::UpgradeProposal,
+                GeneralConsensusMessage::UpgradeVote(_) => MessagePurpose::UpgradeVote,
             },
             SequencingMessage::Committee(committee_message) => match committee_message {
                 CommitteeConsensusMessage::DAProposal(_) => MessagePurpose::Proposal,
