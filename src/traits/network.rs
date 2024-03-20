@@ -162,6 +162,8 @@ pub enum ConsensusIntentEvent<K: SignatureKey> {
     PollForLatestProposal,
     /// Poll for the most recent view sync proposal the webserver has
     PollForLatestViewSyncCertificate,
+    /// Poll for the most recent view sync proposal the webserver has
+    PollForLatestUpgrade,
     /// Poll for a DAC for a particular view
     PollForDAC(u64),
     /// Poll for view sync votes starting at a particular view
