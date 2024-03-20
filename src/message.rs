@@ -84,7 +84,9 @@ pub enum MessagePurpose {
     /// VID disperse, like [`Proposal`].
     VidDisperse,
     /// Message with an upgrade proposal.
-    Upgrade,
+    UpgradeProposal,
+    /// Message with an upgrade vote
+    UpgradeVote,
 
     #[cfg(feature = "arbitrary-messages")]
     /// Arbitrary messages with raw bytes. Mostly intended to be used in testing.

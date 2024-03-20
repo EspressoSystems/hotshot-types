@@ -154,16 +154,18 @@ pub enum NetworkError {
 pub enum ConsensusIntentEvent<K: SignatureKey> {
     /// Poll for votes for a particular view
     PollForVotes(u64),
+    /// Poll for upgrade votes for a particular view
+    PollForUpgradeVotes(u64),
     /// Poll for a proposal for a particular view
     PollForProposal(u64),
+    /// Poll for an upgrade proposal for a particular view
+    PollForUpgradeProposal(u64),
     /// Poll for VID disperse data for a particular view
     PollForVIDDisperse(u64),
     /// Poll for the most recent [quorum/da] proposal the webserver has
     PollForLatestProposal,
     /// Poll for the most recent view sync proposal the webserver has
     PollForLatestViewSyncCertificate,
-    /// Poll for the most recent view sync proposal the webserver has
-    PollForLatestUpgrade,
     /// Poll for a DAC for a particular view
     PollForDAC(u64),
     /// Poll for view sync votes starting at a particular view
